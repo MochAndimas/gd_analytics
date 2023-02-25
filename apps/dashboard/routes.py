@@ -143,10 +143,8 @@ def coin_page():
 def in_app_page():
     """in app page"""
     # date to filter
-    last1days = datetime.datetime.today() - datetime.timedelta(1)
     last2day = datetime.datetime.today() - datetime.timedelta(2)
     last3day = datetime.datetime.today() - datetime.timedelta(3)
-    last7days = datetime.datetime.today() - datetime.timedelta(7)
     las8days = datetime.datetime.today() - datetime.timedelta(8)
     last9days = datetime.datetime.today() - datetime.timedelta(9)
     last15days = datetime.datetime.today() - datetime.timedelta(15)
