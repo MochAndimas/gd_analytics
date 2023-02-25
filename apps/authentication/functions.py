@@ -40,7 +40,7 @@ def sign_in(form):
     attempted_password = form.password.data
     attempted_user = Account.query.filter_by(
         email=attempted_email).first()
-    email = ['dimas@gooddreamer.id', 'subur@gooddreamer.id']
+    email = ['dimas@gooddreamer.id', 'febriyana@gooddreamer.id', 'betharia@gooddreamer.id', 'didi@gooddreamer.id']
 
     if attempted_user and attempted_user.email in email:
         check_pwdhash = bcrypt.check_password_hash(
