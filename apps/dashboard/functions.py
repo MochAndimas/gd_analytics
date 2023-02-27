@@ -194,7 +194,7 @@ def total_gross_revenue():
         db.func.sum(gtd.package_price+gtd.package_fee).label('revenue')
     ).join(gt, gt.id == gtd.transaction_id).filter(db.func.date(gt.created_at) >= '2022-11-01', gt.transaction_status == 1)
     df = pd.DataFrame(rv)
-    convert_rp = df['revenue'].apply(lambda x: "Rp. {:,.2f}".format((x/10)))
+    convert_rp = df['revenue'].apply(lambda x: "Rp. {:,f}".format((x)))
 
     return convert_rp
 
@@ -206,7 +206,7 @@ def total_revenue():
         db.func.sum(gtd.package_price).label('revenue')
     ).join(gt, gt.id == gtd.transaction_id).filter(db.func.date(gt.created_at) >= '2022-11-01', gt.transaction_status == 1)
     df = pd.DataFrame(rv)
-    convert_rp = df['revenue'].apply(lambda x: "Rp. {:,.2f}".format((x/10)))
+    convert_rp = df['revenue'].apply(lambda x: "Rp. {:,f}".format((x)))
 
     return convert_rp
 
