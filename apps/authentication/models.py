@@ -18,6 +18,7 @@ class Account(db.Model, UserMixin):
     fullname = db.Column('fullname', db.String)
     email = db.Column('email', db.String)
     is_guest = db.Column('is_guest', db.Integer)
+    registered_at = db.Column('registered_at', db.DateTime)
     password_hash = db.Column('password', db.String)
 
     @property
@@ -210,7 +211,7 @@ class AppsflyerAggregatedData(db.Model, UserMixin):
     af_preview_novel_counter = db.Column(
         'af_preview_novel_counter', db.Integer)
     af_register_unique = db.Column('af_register_unique', db.Integer)
-    af_topup_coin_unique = db.Column('af_topup_coin_unique', db.Integer)
+    af_topup_coin_counter = db.Column('af_topup_coin_counter', db.Integer)
     af_coin_purchase_counter = db.Column('af_coin_purchase_counter', db.Integer)
     media_source = db.Column('media_source', db.String)
     campaign = db.Column('campaign', db.String)

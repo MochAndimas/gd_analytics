@@ -163,6 +163,17 @@ content %}
       <div class="col-lg-12 mb-lg-0 mb-4">
         <div class="card z-index-2 h-100">
           <div class="card-body p-3">
+            <div class="pmbc-pmbl-month">
+              <div id="chart_15" class="chart-pmbc-pmbl-m"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row mt-4">
+      <div class="col-lg-12 mb-lg-0 mb-4">
+        <div class="card z-index-2 h-100">
+          <div class="card-body p-3">
             <form role="form" method="POST">
               <label for="from">From</label>
               <input type="text" id="from" name="from" />
@@ -172,7 +183,6 @@ content %}
               <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
             </form>
           </div>
-          <div>
         </div>
       </div>
     </div>
@@ -345,6 +355,9 @@ content %}
 
     var grpahs_tbl_2 = {{pembeli_paginate | safe}};
     Plotly.plot('chart_b',grpahs_tbl_2,{});
+
+    var grpahs_14 = {{pmbc_pmbl_month | safe}};
+    Plotly.plot('chart_15',grpahs_14,{});
   </script>
   <link rel="stylesheet" href="//code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
   <link rel="stylesheet" href="/resources/demos/style.css">

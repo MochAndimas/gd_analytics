@@ -12,12 +12,15 @@ from apps.authentication.models import AppsflyerAggregatedData as aad
 from apps.dashboard.functions import pembaca_pgnt, pembeli_pgnt, total_pembaca_month
 from apps.dashboard.functions import total_pembeli_month, genre_pembeli, genre_pembaca
 from apps.dashboard.functions import total_revenue, total_transaksi_coin, category_coin
-from apps.dashboard.functions import revenue_month, pembaca_day, pembeli_day, total_gross_revenue
+from apps.dashboard.functions import revenue_days, pembaca_day, pembeli_day, total_gross_revenue
 from apps.dashboard.functions import daily_growth_pembaca, daily_growth_pembeli, daily_growth_coin
 from apps.dashboard.functions import daily_growth_total_coin, dg_revenue_gross, dg_revenue
 from apps.dashboard.functions import coin_days, dg_app_event, in_app_chart
 from apps.dashboard.functions import install_media_source_table, install_media_source_chart, dau_mau_chart
-from apps.dashboard.functions import dau_mau_sum_text, dau_mau_avg_text
+from apps.dashboard.functions import dau_mau_sum_text, dau_mau_avg_text, pembaca_pembeli_month
+from apps.dashboard.functions import revenue_month, transaction_coin_month, daily_growth_pembaca_week
+from apps.dashboard.functions import daily_growth_pembeli_week, daily_growth_coin_week, dg_register
+from apps.dashboard.functions import af, register, baca_novel, beli_novel, beli_coin
 from decouple import config
 
 
@@ -45,6 +48,9 @@ def dashboard_page():
     # persentase daily growth pembaca
     dg_pembaca = daily_growth_pembaca(from_date=yesterday_date, to_date=date.today())
     dg_pembeli = daily_growth_pembeli(from_date=yesterday_date, to_date=date.today())
+
+    # pembaca & pembeli chart /Month
+    pmbc_pmbl_month = pembaca_pembeli_month()
 
     # pembaca stack chart & pembeli bar chart
     stack_chart = total_pembaca_month(from_date, to_date)
@@ -76,6 +82,7 @@ def dashboard_page():
         pmbl_per_day=pmbl_per_day,
         dg_pembaca=dg_pembaca,
         dg_pembeli=dg_pembeli,
+        pmbc_pmbl_month=pmbc_pmbl_month
     )
 
 
@@ -103,6 +110,12 @@ def coin_page():
     dg_revenue_gross_txt = dg_revenue_gross()
     dg_revenue_txt = dg_revenue()
 
+    # coin purchase /Month
+    coin_month = transaction_coin_month()
+
+    # tottal revenue /month chart
+    rev_month = revenue_month()
+
     # total gross revenue chart
     total_gross_rv = total_gross_revenue()
 
@@ -116,7 +129,7 @@ def coin_page():
     cat_coin = category_coin(from_date=from_date, to_date=to_date)
 
     # total revenue chart
-    rev_month = revenue_month(from_date=from_date, to_date=to_date)
+    rev_days = revenue_days(from_date=from_date, to_date=to_date)
 
     # pembelian coin /days
     chart_coin_days = coin_days()
@@ -128,13 +141,15 @@ def coin_page():
         total_rv=total_rv,
         total_tc=total_tc,
         cat_coin=cat_coin,
-        rev_month=rev_month,
+        rev_days=rev_days,
         dg_coin_expired=dg_coin_expired,
         dg_coin_success=dg_coin_success,
         dg_total_coin=dg_total_coin,
         dg_revenue_gross_txt=dg_revenue_gross_txt,
         dg_revenue_txt=dg_revenue_txt,
-        chart_coin_days=chart_coin_days
+        chart_coin_days=chart_coin_days,
+        rev_month=rev_month,
+        coin_month=coin_month
     )
 
 
@@ -162,15 +177,22 @@ def in_app_page():
         to_date = request.form['to']
 
     """GET methods section"""
+    # event /Week
+    af_event = pd.DataFrame(af(from_date=last8days_date, to_date=last2day_date))
+    register_week = register(from_date=last8days_date, to_date=last2day_date)
+    beli_coin_week = beli_coin(from_date=last8days_date, to_date=last2day_date)
+    beli_novel_week = beli_novel(from_date=last8days_date, to_date=last2day_date)
+    baca_novel_week = baca_novel(from_date=last8days_date, to_date=last2day_date) 
+
     # daily growth
     daily_growth_install = dg_app_event(event=aad.installs)
     daily_growth_preview_novel = dg_app_event(
         event=aad.af_preview_novel_counter)
-    daily_growth_baca_novel = daily_growth_pembaca(from_date=last3day_date, to_date=last2day_date)
-    daily_growth_register = dg_app_event(event=aad.af_register_unique)
-    daily_growth_topup_coin = dg_app_event(event=aad.af_topup_coin_unique)
-    daily_growth_beli_coin = daily_growth_coin(transaction_status=1, from_date=last3day_date, to_date=last2day_date)
-    daily_growth_pembeli_novel = daily_growth_pembeli(from_date=last3day_date, to_date=last2day_date)
+    daily_growth_baca_novel = daily_growth_pembaca_week()
+    daily_growth_register = dg_register()
+    daily_growth_topup_coin = dg_app_event(event=aad.af_topup_coin_counter)
+    daily_growth_beli_coin = daily_growth_coin_week(transaction_status=1)
+    daily_growth_pembeli_novel = daily_growth_pembeli_week()
 
     # inapp chart
     inapp_chart = in_app_chart()
@@ -197,6 +219,13 @@ def in_app_page():
     return render_template(
         'in_app.html',
         db=db,
+        last2day_date=last2day_date,
+        last8days_date=last8days_date,
+        af_event=af_event,
+        baca_novel_week=baca_novel_week,
+        register_week=register_week,
+        beli_coin_week=beli_coin_week,
+        beli_novel_week=beli_novel_week,
         daily_growth_install=daily_growth_install,
         daily_growth_preview_novel=daily_growth_preview_novel,
         daily_growth_baca_novel=daily_growth_baca_novel,

@@ -184,6 +184,28 @@ content %}
           <div class="col-lg-12 mb-lg-0 mb-4">
             <div class="card z-index-2 h-100">
               <div class="card-body p-3">
+                <div class="coin-purc">
+                  <div id="chart_17" class="coin-purc-chart"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row mt-4">
+          <div class="col-lg-12 mb-lg-0 mb-4">
+            <div class="card z-index-2 h-100">
+              <div class="card-body p-3">
+                <div class="rev-month">
+                  <div id="chart_16" class="rev-month-chart"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row mt-4">
+          <div class="col-lg-12 mb-lg-0 mb-4">
+            <div class="card z-index-2 h-100">
+              <div class="card-body p-3">
                 <form role="form" method="POST">
                   <label for="from">From</label>
                   <input type="text" id="from" name="from" />
@@ -309,11 +331,17 @@ content %}
     var graphs_5 = {{cat_coin | safe}};
     Plotly.plot('chart_6',graphs_5,{});
 
-    var graphs_6 = {{rev_month | safe}};
+    var graphs_6 = {{rev_days | safe}};
     Plotly.plot('chart_7',graphs_6,{});
 
     var graphs_9 = {{chart_coin_days | safe}};
     Plotly.plot('chart_10',graphs_9,{});
+
+    var graphs_15 = {{rev_month | safe}};
+    Plotly.plot('chart_16',graphs_15,{});
+
+    var graphs_16 = {{coin_month | safe}};
+    Plotly.plot('chart_17',graphs_16,{});
   </script>
   <link rel="stylesheet" href="//code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
   <link rel="stylesheet" href="/resources/demos/style.css">

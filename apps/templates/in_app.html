@@ -35,14 +35,14 @@ content %}
                           </p>
                           <h5 class="font-weight-bolder" align="center">
                             <p>
-                              {{db.session.execute(db.text("""select sum(installs) from appsflyer_aggregated_data""")).scalar()}}
+                              {{af_event.installs.values[0]}}
                             </p>
                           </h5>
                           <p class="mb-1" style="font-size:12px;" align="center">
                             {% if '-' in daily_growth_install %}
-                            <span class="text-danger text-sm font-weight-bolder">{{daily_growth_install}}</span> than Yesterday
+                            <span class="text-danger text-sm font-weight-bolder">{{daily_growth_install}}</span> Than Last Week
                             {%else%}
-                            <span class="text-success text-sm font-weight-bolder">+{{daily_growth_install}}</span> than Yesterday
+                            <span class="text-success text-sm font-weight-bolder">+{{daily_growth_install}}</span> Than Last Week
                             {%endif%}
                           </p>
                         </div>
@@ -63,14 +63,14 @@ content %}
                           </p>
                           <h5 class="font-weight-bolder" align="center">
                             <p>
-                              {{db.session.execute(db.text("""select sum(af_preview_novel_counter) from appsflyer_aggregated_data""")).scalar()}}
+                              {{af_event.preview_novel.values[0]}}
                             </p>
                           </h5>
                           <p class="mb-1" style="font-size:12px;" align="center">
                             {% if '-' in daily_growth_preview_novel %}
-                            <span class="text-danger text-sm font-weight-bolder">{{daily_growth_preview_novel}}</span> than Yesterday
+                            <span class="text-danger text-sm font-weight-bolder">{{daily_growth_preview_novel}}</span> Than Last Week
                             {%else%}
-                            <span class="text-success text-sm font-weight-bolder">+{{daily_growth_preview_novel}}</span> than Yesterday
+                            <span class="text-success text-sm font-weight-bolder">+{{daily_growth_preview_novel}}</span> Than Last Week
                             {%endif%}
                           </p>
                         </div>
@@ -91,15 +91,14 @@ content %}
                           </p>
                           <h5 class="font-weight-bolder" align="center">
                             <p>
-                              {{db.session.execute(db.text("""select count(id) from
-                              gooddreamer_user_novel_progression where date(created_at) >= '2023-01-09'""")).scalar()}}
+                              {{baca_novel_week.scalar()}}
                             </p>
                           </h5>
                           <p class="mb-1" style="font-size:12px;" align="center">
                             {% if '-' in daily_growth_baca_novel %}
-                            <span class="text-danger text-sm font-weight-bolder">{{daily_growth_baca_novel}}</span> than Yesterday
+                            <span class="text-danger text-sm font-weight-bolder">{{daily_growth_baca_novel}}</span> Than Last Week
                             {%else%}
-                            <span class="text-success text-sm font-weight-bolder">+{{daily_growth_baca_novel}}</span> than Yesterday
+                            <span class="text-success text-sm font-weight-bolder">+{{daily_growth_baca_novel}}</span> Than Last Week
                             {%endif%}
                           </p>
                         </div>
@@ -120,14 +119,14 @@ content %}
                           </p>
                           <h5 class="font-weight-bolder" align="center">
                             <p>
-                              {{db.session.execute(db.text("""select sum(af_register_unique) from appsflyer_aggregated_data""")).scalar()}}
+                              {{register_week.scalar()}}
                             </p>
                           </h5>
                           <p class="mb-1" style="font-size:12px;" align="center">
                             {% if '-' in daily_growth_register %}
-                            <span class="text-danger text-sm font-weight-bolder">{{daily_growth_register}}</span> than Yesterday
+                            <span class="text-danger text-sm font-weight-bolder">{{daily_growth_register}}</span> Than Last Week
                             {%else%}
-                            <span class="text-success text-sm font-weight-bolder">+{{daily_growth_register}}</span> than Yesterday
+                            <span class="text-success text-sm font-weight-bolder">+{{daily_growth_register}}</span> Than Last Week
                             {%endif%}
                           </p>
                         </div>
@@ -148,14 +147,14 @@ content %}
                           </p>
                           <h5 class="font-weight-bolder" align="center">
                             <p>
-                              {{db.session.execute(db.text("""select sum(af_topup_coin_unique) from appsflyer_aggregated_data""")).scalar()}}
+                              {{af_event.klik_topup_koin.values[0]}}
                             </p>
                           </h5>
                           <p class="mb-1" style="font-size:12px;" align="center">
                             {% if '-' in daily_growth_topup_coin %}
-                            <span class="text-danger text-sm font-weight-bolder">{{daily_growth_topup_coin}}</span> than Yesterday
+                            <span class="text-danger text-sm font-weight-bolder">{{daily_growth_topup_coin}}</span> Than Last Week
                             {%else%}
-                            <span class="text-success text-sm font-weight-bolder">+{{daily_growth_topup_coin}}</span> than Yesterday
+                            <span class="text-success text-sm font-weight-bolder">+{{daily_growth_topup_coin}}</span> Than Last Week
                             {%endif%}
                           </p>
                         </div>
@@ -176,14 +175,14 @@ content %}
                           </p>
                           <h5 class="font-weight-bolder" align="center">
                             <p>
-                              {{db.session.execute(db.text("""select count(user_id) from gooddreamer_transaction where date(created_at) >= '2023-01-09 and transaction_status = 1'""")).scalar()}}
+                              {{beli_coin_week.scalar()}}
                             </p>
                           </h5>
                           <p class="mb-1" style="font-size:12px;" align="center">
                             {% if '-' in daily_growth_beli_coin %}
-                            <span class="text-danger text-sm font-weight-bolder">{{daily_growth_beli_coin}}</span> than Yesterday
+                            <span class="text-danger text-sm font-weight-bolder">{{daily_growth_beli_coin}}</span> Than Last Week
                             {%else%}
-                            <span class="text-success text-sm font-weight-bolder">+{{daily_growth_beli_coin}}</span> than Yesterday
+                            <span class="text-success text-sm font-weight-bolder">+{{daily_growth_beli_coin}}</span> Than Last Week
                             {%endif%}
                           </p>
                         </div>
@@ -204,14 +203,14 @@ content %}
                           </p>
                           <h5 class="font-weight-bolder" align="center">
                             <p>
-                              {{db.session.execute(db.text("""select count(user_id) from gooddreamer_novel_transaction where date(created_at) >= '2023-01-09' """)).scalar()}}
+                              {{beli_novel_week.scalar()}}
                             </p>
                           </h5>
                           <p class="mb-1" style="font-size:12px;" align="center">
                             {% if '-' in daily_growth_pembeli_novel %}
-                            <span class="text-danger text-sm font-weight-bolder">{{daily_growth_pembeli_novel}}</span> than Yesterday
+                            <span class="text-danger text-sm font-weight-bolder">{{daily_growth_pembeli_novel}}</span> Than Last Week
                             {%else%}
-                            <span class="text-success text-sm font-weight-bolder">+{{daily_growth_pembeli_novel}}</span> than Yesterday
+                            <span class="text-success text-sm font-weight-bolder">+{{daily_growth_pembeli_novel}}</span> Than Last Week
                             {%endif%}
                           </p>
                         </div>

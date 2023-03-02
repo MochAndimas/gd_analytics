@@ -14,6 +14,7 @@ from apps.authentication.models import GooddreamerNovel as gn, GooddreamerUserNo
 from apps.authentication.models import GooddreamerTransactionDetails as gtd, GooddreamerTransaction as gt, DataCategory as dc
 from apps.authentication.models import PivotNovelCategory as pnc, Account as ac, AppsflyerAggregatedData as aad
 
+
 def read_query(text):
     """conevert query statement into pandas"""
 
@@ -32,13 +33,13 @@ def pembaca_pgnt(from_date='2023-01-01', to_date='2023-02-06'):
             partition_by=gunp.novel_id).label('total_pembaca')).join(
         gunp,
         gunp.novel_id == gn.id).filter(db.func.date(gunp.create_at).between(from_date, to_date)).order_by(desc('total_pembaca'))
-    
+
     df = pd.DataFrame(query)
 
     fig = go.Figure(
         go.Table(header=dict(values=df.columns),
                  cells=dict(values=[df.novel_id, df.novel_title, df.total_pembaca])),
-                 layout=dict(height=650, width=520)
+        layout=dict(height=650, width=520)
     )
     fig.update_layout(title='Jumlah Pembaca')
     chart = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
@@ -61,7 +62,7 @@ def pembeli_pgnt(from_date='2023-01-01', to_date='2023-02-06'):
     fig = go.Figure(
         go.Table(header=dict(values=df.columns),
                  cells=dict(values=[df.novel_id, df.novel_title, df.total_pembeli])),
-                 layout=dict(height=650, width=520)
+        layout=dict(height=650, width=520)
     )
     fig.update_layout(title='Jumlah Pembeli')
 
@@ -192,7 +193,7 @@ def total_gross_revenue():
 
     rv = db.session.query(
         db.func.sum(gtd.package_price+gtd.package_fee).label('revenue')
-    ).join(gt, gt.id == gtd.transaction_id).filter(db.func.date(gt.created_at) >= '2022-11-01', gt.transaction_status == 1)
+    ).join(gt, gt.id == gtd.transaction_id).filter(db.func.date(gt.created_at) >= '2023-01-01', gt.transaction_status == 1)
     df = pd.DataFrame(rv)
     convert_rp = df['revenue'].apply(lambda x: "Rp. {:,f}".format((x)))
 
@@ -204,7 +205,7 @@ def total_revenue():
 
     rv = db.session.query(
         db.func.sum(gtd.package_price).label('revenue')
-    ).join(gt, gt.id == gtd.transaction_id).filter(db.func.date(gt.created_at) >= '2022-11-01', gt.transaction_status == 1)
+    ).join(gt, gt.id == gtd.transaction_id).filter(db.func.date(gt.created_at) >= '2023-01-01', gt.transaction_status == 1)
     df = pd.DataFrame(rv)
     convert_rp = df['revenue'].apply(lambda x: "Rp. {:,f}".format((x)))
 
@@ -293,7 +294,7 @@ def category_coin(from_date='2023-01-01', to_date='2023-02-06'):
     return chart
 
 
-def revenue_month(from_date='2023-01-01', to_date='2023-02-06'):
+def revenue_days(from_date='2023-01-01', to_date='2023-02-06'):
     """chart revenue /month"""
 
     query = db.session.query(
@@ -305,7 +306,7 @@ def revenue_month(from_date='2023-01-01', to_date='2023-02-06'):
     revenue_df = pd.DataFrame(query)
 
     fig = go.Figure(
-        go.Line(x=revenue_df.date, y=revenue_df.total_revenue)
+        go.Scatter(x=revenue_df.date, y=revenue_df.total_revenue)
     )
 
     # config figure
@@ -382,9 +383,6 @@ def daily_growth_pembaca(from_date=None, to_date=None):
     today = db.session.query(
         db.func.count(gunp.id).label('today')
     ).filter(db.func.date(gunp.create_at) == to_date).scalar()
-
-    last_1_days = datetime.datetime.today() - datetime.timedelta(1)
-    yesterday_date = last_1_days.date()
     yesterday = db.session.query(
         db.func.count(gunp.id).label('yesterday')
     ).filter(db.func.date(gunp.create_at) == from_date).scalar()
@@ -399,14 +397,40 @@ def daily_growth_pembaca(from_date=None, to_date=None):
     return txt
 
 
+def daily_growth_pembaca_week():
+    """daily growth pembaca"""
+    last2day = datetime.datetime.today() - datetime.timedelta(2)
+    las8days = datetime.datetime.today() - datetime.timedelta(8)
+    last9days = datetime.datetime.today() - datetime.timedelta(9)
+    last15days = datetime.datetime.today() - datetime.timedelta(15)
+    last2day_date = last2day.date()
+    last8days_date = las8days.date()
+    last9days_date = last9days.date()
+    last15days_date = last15days.date()
+
+    week1 = db.session.query(
+        db.func.count(gunp.id).label('today')
+    ).filter(db.func.date(gunp.create_at).between(last8days_date, last2day_date)).scalar()
+    week2 = db.session.query(
+        db.func.count(gunp.id).label('yesterday')
+    ).filter(db.func.date(gunp.create_at).between(last15days_date, last9days_date)).scalar()
+
+    if week1 == 0:
+        growth = 0
+    else:
+        growth = (week1-week2)/week1
+
+    txt = "{:.0%}".format(growth)
+
+    return txt
+
+
 def daily_growth_pembeli(from_date=None, to_date=None):
     """daily growth pembeli"""
 
     today = db.session.query(
         db.func.count(gnt.id).label('today')
     ).filter(db.func.date(gnt.created_at) == to_date).scalar()
-    last_1_days = datetime.datetime.today() - datetime.timedelta(1)
-    yesterday_date = last_1_days.date()
     yesterday = db.session.query(
         db.func.count(gnt.id).label('yesterday')
     ).filter(db.func.date(gnt.created_at) == from_date).scalar()
@@ -415,6 +439,34 @@ def daily_growth_pembeli(from_date=None, to_date=None):
         growth = 0
     else:
         growth = (today-yesterday)/today
+
+    txt = "{:.0%}".format(growth)
+
+    return txt
+
+
+def daily_growth_pembeli_week():
+    """daily growth pembeli"""
+    last2day = datetime.datetime.today() - datetime.timedelta(2)
+    las8days = datetime.datetime.today() - datetime.timedelta(8)
+    last9days = datetime.datetime.today() - datetime.timedelta(9)
+    last15days = datetime.datetime.today() - datetime.timedelta(15)
+    last2day_date = last2day.date()
+    last8days_date = las8days.date()
+    last9days_date = last9days.date()
+    last15days_date = last15days.date()
+
+    week1 = db.session.query(
+        db.func.count(gnt.id).label('today')
+    ).filter(db.func.date(gnt.created_at).between(last8days_date, last2day_date)).scalar()
+    week2 = db.session.query(
+        db.func.count(gnt.id).label('yesterday')
+    ).filter(db.func.date(gnt.created_at).between(last15days_date, last9days_date)).scalar()
+
+    if week1 == 0:
+        growth = 0
+    else:
+        growth = (week1-week2)/week1
 
     txt = "{:.0%}".format(growth)
 
@@ -430,6 +482,34 @@ def daily_growth_coin(transaction_status=0, from_date=None, to_date=None):
     yesterday = db.session.query(
         db.func.count(gt.id).label('yesterday')
     ).filter(db.func.date(gt.created_at) == from_date, gt.transaction_status == transaction_status).scalar()
+
+    if today == 0:
+        growth = 0
+    else:
+        growth = (today-yesterday)/today
+
+    txt = "{:.0%}".format(growth)
+
+    return
+
+
+def daily_growth_coin_week(transaction_status=0):
+    """daily growth coin. 0 = Pending, 1 = Success, 2 = Expired"""
+    last2day = datetime.datetime.today() - datetime.timedelta(2)
+    las8days = datetime.datetime.today() - datetime.timedelta(8)
+    last9days = datetime.datetime.today() - datetime.timedelta(9)
+    last15days = datetime.datetime.today() - datetime.timedelta(15)
+    last2day_date = last2day.date()
+    last8days_date = las8days.date()
+    last9days_date = last9days.date()
+    last15days_date = last15days.date()
+
+    today = db.session.query(
+        db.func.count(gt.id).label('today')
+    ).filter(db.func.date(gt.created_at).between(last8days_date, last2day_date), gt.transaction_status == transaction_status).scalar()
+    yesterday = db.session.query(
+        db.func.count(gt.id).label('yesterday')
+    ).filter(db.func.date(gt.created_at).between(last15days_date, last9days_date), gt.transaction_status == transaction_status).scalar()
 
     if today == 0:
         growth = 0
@@ -538,59 +618,110 @@ def coin_days(from_date='2023-01-01', to_date='2023-02-06'):
 
 def dg_app_event(event=None):
     """daily growth install"""
-    last_1_days = datetime.datetime.today() - datetime.timedelta(2)
-    yesterday_date = last_1_days.date()
-    today = db.session.query(
-        db.func.sum(event)
-    ).filter(aad.date == yesterday_date).scalar()
-    last_2_days = datetime.datetime.today() - datetime.timedelta(3)
-    last2day_date = last_2_days.date()
-    yesterday = db.session.query(
-        db.func.sum(event)
-    ).filter(aad.date == last2day_date).scalar()
+    last2day = datetime.datetime.today() - datetime.timedelta(2)
+    las8days = datetime.datetime.today() - datetime.timedelta(8)
+    last9days = datetime.datetime.today() - datetime.timedelta(9)
+    last15days = datetime.datetime.today() - datetime.timedelta(15)
+    last2day_date = last2day.date()
+    last8days_date = las8days.date()
+    last9days_date = last9days.date()
+    last15days_date = last15days.date()
 
-    if today == None:
+    week1 = db.session.query(
+        db.func.sum(event)
+    ).filter(aad.date.between(last8days_date, last2day_date)).scalar()
+    week2 = db.session.query(
+        db.func.sum(event)
+    ).filter(aad.date.between(last15days_date, last9days_date)).scalar()
+
+    if week1 == None:
         growth = 0
     else:
-        growth = (today-yesterday)/today
+        growth = (week1-week2)/week1
 
     txt = "{:.0%}".format(growth)
 
     return txt
 
 
+def dg_register():
+    """daily growth register"""
+    last2day = datetime.datetime.today() - datetime.timedelta(2)
+    las8days = datetime.datetime.today() - datetime.timedelta(8)
+    last9days = datetime.datetime.today() - datetime.timedelta(9)
+    last15days = datetime.datetime.today() - datetime.timedelta(15)
+    last2day_date = last2day.date()
+    last8days_date = las8days.date()
+    last9days_date = last9days.date()
+    last15days_date = last15days.date()
+
+    week1 = db.session.query(
+        db.func.count(ac.id)
+    ).filter(db.func.date(ac.registered_at).between(last8days_date, last2day_date), ac.is_guest == 0).scalar()
+
+    week2 = db.session.query(
+        db.func.count(ac.id)
+    ).filter(db.func.date(ac.registered_at).between(last15days_date, last9days_date), ac.is_guest == 0).scalar()
+
+    if week1 == None:
+        growth = 0
+    else:
+        growth = (week1 - week2)/week1
+
+    txt = "{:.0%}".format(growth)
+
+    return txt
+
+
+def af(from_date=None, to_date=None):
+    """Appsfyer event last week"""
+    query_af_w1 = db.session.query(
+        db.func.sum(aad.installs).label('installs'),
+        db.func.sum(aad.af_preview_novel_counter).label('preview_novel'),
+        db.func.sum(aad.af_topup_coin_counter).label('klik_topup_koin')
+    ).filter(db.func.date(aad.date).between(from_date, to_date))
+
+    return query_af_w1
+
+
+def register(from_date=None, to_date=None):
+    """total register last week"""
+    reg = db.session.query(
+        db.func.count(ac.id).label('register')
+    ).filter(db.func.date(ac.registered_at).between(from_date, to_date), ac.is_guest == 0)
+
+    return reg
+
+
+def baca_novel(from_date=None, to_date=None):
+    """baca novel last week"""
+    baca_novel_w1 = db.session.query(
+        db.func.count(gunp.user_id).label('pembaca_novel')
+    ).filter(db.func.date(gunp.create_at).between(from_date, to_date))
+
+    return baca_novel_w1
+
+
+def beli_coin(from_date=None, to_date=None):
+    """beli coin last week"""
+    beli_coin_w1 = db.session.query(
+        db.func.count(gt.user_id).label('beli_coin')
+    ).filter(db.func.date(gt.created_at).between(from_date, to_date), gt.transaction_status == 1)
+
+    return beli_coin_w1
+
+
+def beli_novel(from_date=None, to_date=None):
+    """beli_novel last week"""
+    beli_novel_w1 = db.session.query(
+        db.func.count(gnt.user_id).label('beli_novel')
+    ).filter(db.func.date(gnt.created_at).between(from_date, to_date))
+
+    return beli_novel_w1
+
+
 def in_app_chart():
     """in app chart"""
-    def af(from_date=None, to_date=None):
-        query_af_w1 = db.session.query(
-            db.func.sum(aad.installs).label('installs'),
-            db.func.sum(aad.af_preview_novel_counter).label('preview_novel'),
-            db.func.sum(aad.af_register_unique).label('register'),
-            db.func.sum(aad.af_topup_coin_unique).label('klik_topup_koin')
-        ).filter(db.func.date(aad.date).between(from_date, to_date))
-
-        return query_af_w1
-
-    def baca_novel(from_date=None, to_date=None):
-        baca_novel_w1 = db.session.query(
-            db.func.count(gunp.user_id).label('pembaca_novel')
-        ).filter(db.func.date(gunp.create_at).between(from_date, to_date))
-
-        return baca_novel_w1
-
-    def beli_coin(from_date=None, to_date=None):
-        beli_coin_w1 = db.session.query(
-            db.func.count(gt.user_id).label('beli_coin')
-        ).filter(db.func.date(gt.created_at).between(from_date, to_date), gt.transaction_status == 1)
-
-        return beli_coin_w1
-
-    def beli_novel(from_date=None, to_date=None):
-        beli_novel_w1 = db.session.query(
-            db.func.count(gnt.user_id).label('beli_novel')
-        ).filter(db.func.date(gnt.created_at).between(from_date, to_date))
-
-        return beli_novel_w1
 
     last2days = datetime.datetime.today() - datetime.timedelta(2)
     last8days = datetime.datetime.today() - datetime.timedelta(8)
@@ -605,6 +736,10 @@ def in_app_chart():
         af(from_date=last8days_date, to_date=last2days_date))
     df_af_w2 = pd.DataFrame(
         af(from_date=last15days_date, to_date=last9days_date))
+    df_reg_w1 = pd.DataFrame(
+        register(from_date=last8days_date, to_date=last2days_date))
+    df_reg_w2 = pd.DataFrame(
+        register(from_date=last15days_date, to_date=last9days_date))
     df_pembaca_w1 = pd.DataFrame(baca_novel(
         from_date=last8days_date, to_date=last2days_date))
     df_pembaca_w2 = pd.DataFrame(baca_novel(
@@ -618,18 +753,24 @@ def in_app_chart():
     df_pembeli_w2 = pd.DataFrame(beli_novel(
         from_date=last15days_date, to_date=last9days_date))
 
-    xaxes_w1 = [df_pembeli_w1.beli_novel.values[0], df_coin_w1.beli_coin.values[0], df_af_w1.klik_topup_koin.values[0], df_af_w1.register.values[0], df_pembaca_w1.pembaca_novel.values[0], df_af_w1.preview_novel.values[0], df_af_w1.installs.values[0]]
-    xaxes_w2 = [df_pembeli_w2.beli_novel.values[0], df_coin_w2.beli_coin.values[0], df_af_w2.klik_topup_koin.values[0], df_af_w2.register.values[0], df_pembaca_w2.pembaca_novel.values[0], df_af_w2.preview_novel.values[0], df_af_w2.installs.values[0]]
-    yaxes = ['beli_novel', 'beli_coin', 'klik_topup_coin', 'register', 'pembaca_novel', 'preview_novel', 'installs']
-    
+    xaxes_w1 = [df_pembeli_w1.beli_novel.values[0], df_coin_w1.beli_coin.values[0], df_af_w1.klik_topup_koin.values[0],
+                df_reg_w1.register.values[0], df_pembaca_w1.pembaca_novel.values[0], df_af_w1.preview_novel.values[0], df_af_w1.installs.values[0]]
+    xaxes_w2 = [df_pembeli_w2.beli_novel.values[0], df_coin_w2.beli_coin.values[0], df_af_w2.klik_topup_koin.values[0],
+                df_reg_w2.register.values[0], df_pembaca_w2.pembaca_novel.values[0], df_af_w2.preview_novel.values[0], df_af_w2.installs.values[0]]
+    yaxes = ['beli_novel', 'beli_coin', 'klik_topup_coin',
+             'register', 'pembaca_novel', 'preview_novel', 'installs']
+
     fig = go.Figure(data=[
-        go.Bar(name=f'{last8days_date} - {last2days_date}', y=yaxes, x=xaxes_w1, orientation='h', marker=dict(color='red'), text=xaxes_w1, textposition='outside'),
-        go.Bar(name=f'{last15days_date} - {last9days_date}', y=yaxes, x=xaxes_w2, orientation='h', marker=dict(color='blue'), text=xaxes_w2, textposition='outside')
+        go.Bar(name=f'{last8days_date} - {last2days_date}', y=yaxes, x=xaxes_w1,
+               orientation='h', marker=dict(color='red'), text=xaxes_w1, textposition='outside'),
+        go.Bar(name=f'{last15days_date} - {last9days_date}', y=yaxes, x=xaxes_w2,
+               orientation='h', marker=dict(color='blue'), text=xaxes_w2, textposition='outside')
     ], layout=dict(height=650))
 
-    fig.update_layout(title='App Events /7 Days Periods',barmode='group', legend_title_text="Periods")
+    fig.update_layout(title='App Events /7 Days Periods',
+                      barmode='group', legend_title_text="Periods")
     fig.update_xaxes(title='value_counts')
-    fig.update_yaxes(title='Events',categoryorder='array', categoryarray=[
+    fig.update_yaxes(title='Events', categoryorder='array', categoryarray=[
         'beli_novel', 'beli_coin', 'klik_topup_coin', 'register', 'pembaca_novel', 'preview_novel', 'installs'
     ])
     chart = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
@@ -652,9 +793,9 @@ def install_media_source_table(from_date='2023-01-09', to_date='2023-01-30'):
     fig = go.Figure(data=[
         go.Table(header=dict(values=df.columns),
                  cells=dict(values=[df.date.values, df.media_source, df.campaign, df.installs]))
-                     ])
+    ])
     fig.update_layout(title='Installs By Media Source')
-    
+
     chart = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
 
     return chart
@@ -665,13 +806,15 @@ def install_media_source_chart(from_date='2023-01-09', to_date='2023-01-30'):
 
     query = db.session.query(
         aad.media_source.distinct().label('media_source'),
-        db.func.sum(aad.installs).over(partition_by=aad.media_source).label('installs')
+        db.func.sum(aad.installs).over(
+            partition_by=aad.media_source).label('installs')
     ).filter(db.func.date(aad.date).between(from_date, to_date), aad.installs != 0)
-    
+
     df = pd.DataFrame(query)
 
     fig = go.Figure(
-        go.Bar(x=df.media_source, y=df.installs, text=df.installs, textposition='outside')
+        go.Bar(x=df.media_source, y=df.installs,
+               text=df.installs, textposition='outside')
     )
 
     fig.update_layout(title='Installs By Media Source')
@@ -688,16 +831,19 @@ def dau_mau_chart(from_date='2023-01-09', to_date='2023-02-23'):
 
     df = pd.read_csv('./dau&mau.csv', delimiter=';')
 
-    filtered_df = df[(df['date'] >= str(from_date)) & (df['date'] <= str(to_date))]
-    
+    filtered_df = df[(df['date'] >= str(from_date))
+                     & (df['date'] <= str(to_date))]
+
     # Create figure with secondary y-axis
     fig = make_subplots(specs=[[{"secondary_y": True}]])
     fig.add_trace(
-        go.Scatter(x=filtered_df.date, y=filtered_df.daily_active_user, name='Daily Active User', mode='lines+markers'),
+        go.Scatter(x=filtered_df.date, y=filtered_df.daily_active_user,
+                   name='Daily Active User', mode='lines+markers'),
         secondary_y=False
     )
     fig.add_trace(
-        go.Scatter(x=filtered_df.date, y=filtered_df.monthly_active_user, name='Monthly Active User', mode='lines+markers'),
+        go.Scatter(x=filtered_df.date, y=filtered_df.monthly_active_user,
+                   name='Monthly Active User', mode='lines+markers'),
         secondary_y=True
     )
     fig.update_layout(title='DAU & MAU /Days')
@@ -732,4 +878,107 @@ def dau_mau_avg_text(from_date=None, to_date=None, column=None):
 
     return sums
 
-    
+
+def pembaca_pembeli_month(from_date='2023-01-01'):
+    """Pembaca pembeli /Month"""
+
+    query_1 = db.session.query(
+        db.func.concat(db.func.year(gnt.created_at), '-',
+                       db.func.month(gnt.created_at)).distinct().label('periods'),
+        db.func.count(gnt.id).over(partition_by=db.func.month(
+            gnt.created_at)).label('pembeli_novel')
+    ).filter(db.func.date(gnt.created_at) >= from_date)
+
+    query_2 = db.session.query(
+        db.func.concat(db.func.year(gunp.create_at), '-',
+                       db.func.month(gunp.create_at)).distinct().label('periods'),
+        db.func.count(gunp.id).over(partition_by=db.func.month(
+            gunp.create_at)).label('pembaca_novel')
+    ).filter(db.func.date(gunp.create_at) >= from_date)
+
+    df_pembeli = pd.DataFrame(query_1)
+    df_pembaca = pd.DataFrame(query_2)
+
+    fig = go.Figure(data=[
+        go.Bar(x=df_pembeli.periods, y=df_pembeli.pembeli_novel,
+               text=df_pembeli.pembeli_novel, textposition='outside', name='pembeli_novel'),
+        go.Bar(x=df_pembaca.periods, y=df_pembaca.pembaca_novel,
+               text=df_pembaca.pembaca_novel, textposition='outside', name='pembaca_novel')
+    ])
+
+    fig.update_layout(title='Pembaca & Pembeli /Month')
+    fig.update_xaxes(title='Periods', dtick='M1')
+    fig.update_yaxes(title='Total')
+
+    chart = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
+
+    return chart
+
+
+def revenue_month(from_date='2023-01-01'):
+    """revenue /Month chart"""
+    query = db.session.query(
+        db.func.concat(db.func.year(gt.created_at), '-',
+                       db.func.month(gt.created_at)).distinct().label('periods'),
+        db.func.sum(gtd.package_price+gtd.package_fee).over(
+            partition_by=db.func.month(gt.created_at)).label('revenue')
+    ).join(gtd, gt.id == gtd.transaction_id).filter(db.func.date(gt.created_at) >= from_date, gt.transaction_status == 1)
+
+    df = pd.DataFrame(query)
+
+    fig = go.Figure(
+        go.Bar(x=df.periods, y=df.revenue, text=df.revenue.apply(
+            lambda x: "Rp. {:,f}".format((x))), textposition='inside')
+    )
+    fig.update_layout(title='Revenue /Month')
+    fig.update_xaxes(title='Periods', dtick='M1')
+    fig.update_yaxes(title='Revenue')
+
+    chart = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
+
+    return chart
+
+
+def transaction_coin_month(from_date='2023-01-01'):
+    """transaction coin /Month"""
+    read_success = db.session.query(
+        db.func.concat(db.func.year(gt.created_at), '-',
+                       db.func.month(gt.created_at)).distinct().label('periods'),
+        db.func.count(gt.user_id).over(partition_by=db.func.month(
+            gt.created_at)).label('transaksi_coin_success')
+    ).filter(gt.transaction_status == 1, db.func.date(gt.created_at) >= from_date).order_by(desc('periods'))
+
+    read_expired = db.session.query(
+        db.func.concat(db.func.year(gt.created_at), '-',
+                       db.func.month(gt.created_at)).distinct().label('periods'),
+        db.func.count(gt.user_id).over(partition_by=db.func.month(
+            gt.created_at)).label('transaksi_coin_expired')
+    ).filter(gt.transaction_status == 2, db.func.date(gt.created_at) >= from_date).order_by(desc('periods'))
+
+    read_total = db.session.query(
+        db.func.concat(db.func.year(gt.created_at), '-',
+                       db.func.month(gt.created_at)).distinct().label('periods'),
+        db.func.count(gt.user_id).over(partition_by=db.func.month(
+            gt.created_at)).label('total_transaction_coin')
+    ).filter(db.func.date(gt.created_at) >= from_date).order_by(desc('periods'))
+
+    df_success = pd.DataFrame(read_success)
+    df_expired = pd.DataFrame(read_expired)
+    df_total = pd.DataFrame(read_total)
+
+    fig = go.Figure(data=[
+        go.Bar(x=df_expired.periods, y=df_expired.transaksi_coin_expired, name='coin_expired',
+               text=df_expired.transaksi_coin_expired, textposition='inside', marker=dict(color='red')),
+        go.Bar(x=df_success.periods, y=df_success.transaksi_coin_success, name='coin_success',
+               text=df_success.transaksi_coin_success, textposition='inside', marker=dict(color='green')),
+        go.Bar(x=df_total.periods, y=df_total.total_transaction_coin, name='total_transaction',
+               text=df_total.total_transaction_coin, textposition='inside', marker=dict(color='blue'))
+    ])
+
+    fig.update_layout(title='Transaction Coin /Month')
+    fig.update_xaxes(title='Periods')
+    fig.update_yaxes(title='Transaction Coin')
+
+    chart = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
+
+    return chart
