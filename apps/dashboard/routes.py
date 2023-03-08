@@ -15,12 +15,14 @@ from apps.dashboard.functions import total_revenue, total_transaksi_coin, catego
 from apps.dashboard.functions import revenue_days, pembaca_day, pembeli_day, total_gross_revenue
 from apps.dashboard.functions import daily_growth_pembaca, daily_growth_pembeli, daily_growth_coin
 from apps.dashboard.functions import daily_growth_total_coin, dg_revenue_gross, dg_revenue
-from apps.dashboard.functions import coin_days, dg_app_event, in_app_chart
-from apps.dashboard.functions import install_media_source_table, install_media_source_chart, dau_mau_chart
-from apps.dashboard.functions import dau_mau_sum_text, dau_mau_avg_text, pembaca_pembeli_month
-from apps.dashboard.functions import revenue_month, transaction_coin_month, daily_growth_pembaca_week
-from apps.dashboard.functions import daily_growth_pembeli_week, daily_growth_coin_week, dg_register
-from apps.dashboard.functions import af, register, baca_novel, beli_novel, beli_coin
+from apps.dashboard.functions import coin_days, dg_register, dau_mau_chart
+from apps.dashboard.functions import dau_mau_avg_text, pembaca_pembeli_month, beli_coin
+from apps.dashboard.functions import revenue_month, transaction_coin_month, af_installs
+from apps.dashboard.functions import register, beli_novel, guest_register_reader_periods
+from apps.dashboard.functions import dg_af_installs, install_chart, pembaca_periods
+from apps.dashboard.functions import dg_pembaca_periods, dg_guest_register_reader, beli_coin_unique, beli_novel_unique
+from apps.dashboard.functions import dg_coin_periods, dg_coin_unique_periods, dg_novel_periods, dg_novel_unique_periods
+from apps.dashboard.functions import user_activity
 from decouple import config
 
 
@@ -159,87 +161,87 @@ def in_app_page():
     """in app page"""
     # date to filter
     last2day = datetime.datetime.today() - datetime.timedelta(2)
-    last3day = datetime.datetime.today() - datetime.timedelta(3)
     las8days = datetime.datetime.today() - datetime.timedelta(8)
-    last9days = datetime.datetime.today() - datetime.timedelta(9)
-    last15days = datetime.datetime.today() - datetime.timedelta(15)
-    last_30_days = datetime.datetime.today() - datetime.timedelta(30)
     last2day_date = last2day.date()
-    last3day_date = last3day.date()
     last8days_date = las8days.date()
-    last9days_date = last9days.date()
-    last15days_date = last15days.date()
-    from_date = last_30_days.date()
-    to_date = date.today()
+    from_date = last8days_date
+    to_date = last2day_date
+    fromdate_lastweek = from_date - datetime.timedelta(7)
+    todate_lastweek = to_date -datetime.timedelta(7)
 
     if request.method == 'POST':
-        from_date = request.form['from']
-        to_date = request.form['to']
-
-    """GET methods section"""
-    # event /Week
-    af_event = pd.DataFrame(af(from_date=last8days_date, to_date=last2day_date))
-    register_week = register(from_date=last8days_date, to_date=last2day_date)
-    beli_coin_week = beli_coin(from_date=last8days_date, to_date=last2day_date)
-    beli_novel_week = beli_novel(from_date=last8days_date, to_date=last2day_date)
-    baca_novel_week = baca_novel(from_date=last8days_date, to_date=last2day_date) 
-
-    # daily growth
-    daily_growth_install = dg_app_event(event=aad.installs)
-    daily_growth_preview_novel = dg_app_event(
-        event=aad.af_preview_novel_counter)
-    daily_growth_baca_novel = daily_growth_pembaca_week()
-    daily_growth_register = dg_register()
-    daily_growth_topup_coin = dg_app_event(event=aad.af_topup_coin_counter)
-    daily_growth_beli_coin = daily_growth_coin_week(transaction_status=1)
-    daily_growth_pembeli_novel = daily_growth_pembeli_week()
-
-    # inapp chart
-    inapp_chart = in_app_chart()
-
-    # installs by media source table
-    table = install_media_source_table(from_date=from_date, to_date=to_date)
-    chart = install_media_source_chart(from_date=from_date, to_date=to_date)
+        from_date = datetime.datetime.strptime(request.form['from'], '%Y-%m-%d').date()
+        to_date = datetime.datetime.strptime(request.form['to'], '%Y-%m-%d').date()
     
-    # DAU & MAU chart
-    dau_mau = dau_mau_chart(from_date=from_date, to_date=to_date)
-    dau_sum = dau_mau_sum_text(from_date=last8days_date, to_date=last2day_date, column='daily_active_user')
-    mau_sum = dau_mau_sum_text(from_date=last8days_date, to_date=last2day_date, column='monthly_active_user')
-    dau_avg = round(dau_mau_avg_text(from_date='2023-01-09', to_date=to_date, column='daily_active_user'),1)
-    mau_avg = round(dau_mau_avg_text(from_date='2023-01-09', to_date=to_date, column='monthly_active_user'),1)
+    """GET methods section"""
+    # user aquisition 
+    installs_text = af_installs(from_date=from_date, to_date=to_date)
+    dau_avg_periods = round(dau_mau_avg_text(from_date=from_date, to_date=to_date, column='daily_active_user'))
+    mau_avg_periods = round(dau_mau_avg_text(from_date=from_date, to_date=to_date, column='monthly_active_user'))
+    register_week = register(from_date=from_date, to_date=to_date)
 
-    # daily growth DAU & MAU
-    dau_sum_w2 = dau_mau_sum_text(from_date=last15days_date, to_date=last9days_date, column='daily_active_user')
-    dg_dau = (dau_sum - dau_sum_w2)/dau_sum
+    # daily growth user aquisition
+    dg_installs = dg_af_installs(from_date=from_date, to_date=to_date)
+    dau_avg_w2 = round(dau_mau_avg_text(from_date=fromdate_lastweek, to_date=todate_lastweek, column='daily_active_user'))
+    dg_dau = (dau_avg_periods - dau_avg_w2)/dau_avg_w2
     dau_dg = "{:.0%}".format(dg_dau)
-    mau_sum_w2 = dau_mau_sum_text(from_date=last15days_date, to_date=last9days_date, column='monthly_active_user')
-    dg_mau = (mau_sum - mau_sum_w2)/mau_sum
+    mau_avg_w2 = round(dau_mau_avg_text(from_date=fromdate_lastweek, to_date=todate_lastweek, column='monthly_active_user'))
+    dg_mau = (mau_avg_periods - mau_avg_w2)/mau_avg_periods
     mau_dg = "{:.0%}".format(dg_mau)
+    daily_growth_register = dg_register(from_date=from_date, to_date=to_date)
+
+    # user aqusition chart
+    dau_mau = dau_mau_chart(from_date=from_date, to_date=to_date)
+    chart_install = install_chart(from_date=from_date, to_date=to_date)
+
+    # User activity
+    pembaca_preiod = pembaca_periods(from_date=from_date, to_date=to_date)
+    guest_reader = guest_register_reader_periods(from_date=from_date, to_date=to_date, is_guest=1)
+    register_reader = guest_register_reader_periods(from_date=from_date, to_date=to_date, is_guest=0)
+    beli_coin_week = beli_coin(from_date=from_date, to_date=to_date).scalar()
+    beli_coin_uniques = beli_coin_unique(from_date=from_date, to_date=to_date)
+    beli_novel_week = beli_novel(from_date=from_date, to_date=to_date).scalar()
+    beli_novel_uniques= beli_novel_unique(from_date=from_date, to_date=to_date)
+
+    # user activity daily growth
+    dg_total_pembaca = dg_pembaca_periods(from_date=from_date, to_date=to_date)
+    dg_guest_reader = dg_guest_register_reader(from_date=from_date, to_date=to_date, is_guest=1)
+    dg_register_reader = dg_guest_register_reader(from_date=from_date, to_date=to_date, is_guest=0)
+    dg_coin_period = dg_coin_periods(from_date=from_date, to_date=to_date)
+    dg_coin_unique_period = dg_coin_unique_periods(from_date=from_date, to_date=to_date) 
+    dg_novel_period = dg_novel_periods(from_date=from_date, to_date=to_date)
+    dg_novel_unique_period = dg_novel_unique_periods(from_date=from_date, to_date=to_date)
+
+    # user activity daily growth
+    user_journey_chart = user_activity(from_date=from_date, to_date=to_date)
     
     return render_template(
         'in_app.html',
         db=db,
         last2day_date=last2day_date,
         last8days_date=last8days_date,
-        af_event=af_event,
-        baca_novel_week=baca_novel_week,
         register_week=register_week,
         beli_coin_week=beli_coin_week,
         beli_novel_week=beli_novel_week,
-        daily_growth_install=daily_growth_install,
-        daily_growth_preview_novel=daily_growth_preview_novel,
-        daily_growth_baca_novel=daily_growth_baca_novel,
+        beli_coin_uniques=beli_coin_uniques,
+        beli_novel_uniques=beli_novel_uniques,
         daily_growth_register=daily_growth_register,
-        daily_growth_topup_coin=daily_growth_topup_coin,
-        daily_growth_beli_coin=daily_growth_beli_coin,
-        daily_growth_pembeli_novel=daily_growth_pembeli_novel,
-        inapp_chart=inapp_chart,
-        table=table,
-        chart=chart,
         dau_mau=dau_mau,
-        dau_sum=dau_sum,
-        mau_sum=mau_sum,
-        dau_avg=dau_avg,
-        mau_avg=mau_avg,
+        dau_avg_periods=dau_avg_periods,
+        mau_avg_periods=mau_avg_periods,
         dau_dg=dau_dg,
-        mau_dg=mau_dg)
+        mau_dg=mau_dg,
+        installs_text=installs_text, 
+        dg_installs=dg_installs,
+        chart_install=chart_install,
+        pembaca_period=pembaca_preiod,
+        guest_reader=guest_reader,
+        register_reader=register_reader,
+        dg_total_pembaca=dg_total_pembaca,
+        dg_guest_reader=dg_guest_reader,
+        dg_register_reader=dg_register_reader,
+        dg_coin_period=dg_coin_period,
+        dg_coin_unique_period=dg_coin_unique_period,
+        dg_novel_period=dg_novel_period,
+        dg_novel_unique_period=dg_novel_unique_period,
+        user_journey_chart=user_journey_chart)

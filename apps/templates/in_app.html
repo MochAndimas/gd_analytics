@@ -17,224 +17,6 @@ content %}
 <main class="main-content position-relative border-radius-lg">
   <div class="container-fluid py-4">
     <div class="row mt-4">
-      <div class="container-fluid py-4">
-        <div class="card card-frame">
-          <div class="card-body bg-deafult">
-            <div class="row">
-              <div class="col-sm-2 mb-xl-0 mb-2">
-                <div class="card">
-                  <div class="card-body p-1">
-                    <div class="row">
-                      <div class="col-12">
-                        <div class="numbers">
-                          <p
-                            class="text-sm mb-1 text-uppercase font-weight-bold"
-                            align="center"
-                          >
-                            <b>Install</b>
-                          </p>
-                          <h5 class="font-weight-bolder" align="center">
-                            <p>
-                              {{af_event.installs.values[0]}}
-                            </p>
-                          </h5>
-                          <p class="mb-1" style="font-size:12px;" align="center">
-                            {% if '-' in daily_growth_install %}
-                            <span class="text-danger text-sm font-weight-bolder">{{daily_growth_install}}</span> Than Last Week
-                            {%else%}
-                            <span class="text-success text-sm font-weight-bolder">+{{daily_growth_install}}</span> Than Last Week
-                            {%endif%}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>        
-                </div>
-                <div class="card">
-                  <div class="card-body p-1">
-                    <div class="row">
-                      <div class="col-12">
-                        <div class="numbers">
-                          <p
-                            class="text-sm mb-1 text-uppercase font-weight-bold"
-                            align="center"
-                          >
-                            <b>Preview Novel</b>
-                          </p>
-                          <h5 class="font-weight-bolder" align="center">
-                            <p>
-                              {{af_event.preview_novel.values[0]}}
-                            </p>
-                          </h5>
-                          <p class="mb-1" style="font-size:12px;" align="center">
-                            {% if '-' in daily_growth_preview_novel %}
-                            <span class="text-danger text-sm font-weight-bolder">{{daily_growth_preview_novel}}</span> Than Last Week
-                            {%else%}
-                            <span class="text-success text-sm font-weight-bolder">+{{daily_growth_preview_novel}}</span> Than Last Week
-                            {%endif%}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div class="card">
-                  <div class="card-body p-1">
-                    <div class="row">
-                      <div class="col-12">
-                        <div class="numbers">
-                          <p
-                            class="text-sm mb-1 text-uppercase font-weight-bold"
-                            align="center"
-                          >
-                            <b>Read Novel</b>
-                          </p>
-                          <h5 class="font-weight-bolder" align="center">
-                            <p>
-                              {{baca_novel_week.scalar()}}
-                            </p>
-                          </h5>
-                          <p class="mb-1" style="font-size:12px;" align="center">
-                            {% if '-' in daily_growth_baca_novel %}
-                            <span class="text-danger text-sm font-weight-bolder">{{daily_growth_baca_novel}}</span> Than Last Week
-                            {%else%}
-                            <span class="text-success text-sm font-weight-bolder">+{{daily_growth_baca_novel}}</span> Than Last Week
-                            {%endif%}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div class="card">
-                  <div class="card-body p-1">
-                    <div class="row">
-                      <div class="col-12">
-                        <div class="numbers">
-                          <p
-                            class="text-sm mb-1 text-uppercase font-weight-bold"
-                            align="center"
-                          >
-                            <b>Register</b>
-                          </p>
-                          <h5 class="font-weight-bolder" align="center">
-                            <p>
-                              {{register_week.scalar()}}
-                            </p>
-                          </h5>
-                          <p class="mb-1" style="font-size:12px;" align="center">
-                            {% if '-' in daily_growth_register %}
-                            <span class="text-danger text-sm font-weight-bolder">{{daily_growth_register}}</span> Than Last Week
-                            {%else%}
-                            <span class="text-success text-sm font-weight-bolder">+{{daily_growth_register}}</span> Than Last Week
-                            {%endif%}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div class="card">
-                  <div class="card-body p-1">
-                    <div class="row">
-                      <div class="col-12">
-                        <div class="numbers">
-                          <p
-                            class="text-sm mb-1 text-uppercase font-weight-bold"
-                            align="center"
-                          >
-                            <b>Klik 'Top Up Coin'</b>
-                          </p>
-                          <h5 class="font-weight-bolder" align="center">
-                            <p>
-                              {{af_event.klik_topup_koin.values[0]}}
-                            </p>
-                          </h5>
-                          <p class="mb-1" style="font-size:12px;" align="center">
-                            {% if '-' in daily_growth_topup_coin %}
-                            <span class="text-danger text-sm font-weight-bolder">{{daily_growth_topup_coin}}</span> Than Last Week
-                            {%else%}
-                            <span class="text-success text-sm font-weight-bolder">+{{daily_growth_topup_coin}}</span> Than Last Week
-                            {%endif%}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div class="card">
-                  <div class="card-body p-1">
-                    <div class="row">
-                      <div class="col-12">
-                        <div class="numbers">
-                          <p
-                            class="text-sm mb-1 text-uppercase font-weight-bold"
-                            align="center"
-                          >
-                            <b>Pembelian Koin</b>
-                          </p>
-                          <h5 class="font-weight-bolder" align="center">
-                            <p>
-                              {{beli_coin_week.scalar()}}
-                            </p>
-                          </h5>
-                          <p class="mb-1" style="font-size:12px;" align="center">
-                            {% if '-' in daily_growth_beli_coin %}
-                            <span class="text-danger text-sm font-weight-bolder">{{daily_growth_beli_coin}}</span> Than Last Week
-                            {%else%}
-                            <span class="text-success text-sm font-weight-bolder">+{{daily_growth_beli_coin}}</span> Than Last Week
-                            {%endif%}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div class="card">
-                  <div class="card-body p-1">
-                    <div class="row">
-                      <div class="col-12">
-                        <div class="numbers">
-                          <p
-                            class="text-sm mb-1 text-uppercase font-weight-bold"
-                            align="center"
-                          >
-                            <b>Beli Novel</b>
-                          </p>
-                          <h5 class="font-weight-bolder" align="center">
-                            <p>
-                              {{beli_novel_week.scalar()}}
-                            </p>
-                          </h5>
-                          <p class="mb-1" style="font-size:12px;" align="center">
-                            {% if '-' in daily_growth_pembeli_novel %}
-                            <span class="text-danger text-sm font-weight-bolder">{{daily_growth_pembeli_novel}}</span> Than Last Week
-                            {%else%}
-                            <span class="text-success text-sm font-weight-bolder">+{{daily_growth_pembeli_novel}}</span> Than Last Week
-                            {%endif%}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="col-sm-10 mb-xl-0 mb-2">
-                <div class="card" style="height: 44rem;">
-                  <div class="card-body">
-                    <div class="chart-inapp">
-                      <div id="chart_11" class="chart_inapp_h"></div>
-                      <p class="font-weight-bolder" style="font-size: 12px;">*Data Delay 1 Day</p>
-                    </div>
-                  </div>        
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="row mt-4">
       <div class="col-lg-12 mb-lg-0 mb-4">
         <div class="card z-index-2 h-100">
           <div class="card-body p-3">
@@ -252,8 +34,45 @@ content %}
     </div>
     <div class="row mt-4">
       <div class="card card-frame">
+        <div class="card-body">
+          <h5 align="center">User Acquisition</h1>
+        </div>
+      </div>
+    </div>
+    <div class="row mt-4">
+      <div class="card card-frame">
         <div class="card-body bg-deafult">
           <div class="row">
+            <div class="col-sm-3 mb-xl-0 mb-2 btn-tooltip">
+              <div class="card">
+                <div class="card-body p-1">
+                  <div class="row">
+                    <div class="col-12">
+                      <div class="numbers">
+                        <p
+                          class="text-sm mb-1 text-uppercase font-weight-bold"
+                          align="center"
+                        >
+                          <b style="font-size: 11px;">Installs</b>
+                        </p>
+                        <h5 class="font-weight-bolder" align="center">
+                          <p>
+                            {{installs_text}}
+                          </p>
+                        </h5>
+                        <p class="mb-1" style="font-size:12px;" align="center">
+                          {% if '-' in dg_installs %}
+                          <span class="text-danger text-sm font-weight-bolder">{{dg_installs}}</span> than Last Periods
+                          {%else%}
+                          <span class="text-success text-sm font-weight-bolder">+{{dg_installs}}</span> than Last Periods
+                          {%endif%}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
             <div class="col-sm-3 mb-xl-0 mb-2">
               <div class="card">
                 <div class="card-body p-1">
@@ -264,11 +83,11 @@ content %}
                           class="text-sm mb-1 text-uppercase font-weight-bold"
                           align="center"
                         >
-                          <b style="font-size: 12px;">Daily Active Users /Week</b>
+                          <b style="font-size: 11px;">Average Daily Active Users (DAU)</b>
                         </p>
                         <h5 class="font-weight-bolder" align="center">
                           <p>
-                            {{dau_sum}}
+                            {{dau_avg_periods}}
                           </p>
                         </h5>
                         <p class="mb-1" style="font-size:12px;" align="center">
@@ -294,11 +113,11 @@ content %}
                           class="text-sm mb-1 text-uppercase font-weight-bold"
                           align="center"
                         >
-                          <b style="font-size: 12px;">Monthly Active User /Week</b>
+                          <b style="font-size: 11px;">Average Monthly Active Users (MAU)</b>
                         </p>
                         <h5 class="font-weight-bolder" align="center">
                           <p>
-                            {{mau_sum}}
+                            {{mau_avg_periods}}
                           </p>
                         </h5>
                         <p class="mb-1" style="font-size:11px;" align="center">
@@ -324,13 +143,189 @@ content %}
                           class="text-sm mb-1 text-uppercase font-weight-bold"
                           align="center"
                         >
-                          <b style="font-size: 13px;">Average Daily Active Users Overall</b>
+                          <b style="font-size: 11px;">Register</b>
                         </p>
                         <h5 class="font-weight-bolder" align="center">
                           <p>
-                            {{dau_avg}}
+                            {{register_week.scalar()}}
                           </p>
                         </h5>
+                        <p class="mb-1" style="font-size:12px;" align="center">
+                          {% if '-' in daily_growth_register %}
+                          <span class="text-danger text-sm font-weight-bolder">{{daily_growth_register}}</span> Than Last Week
+                          {%else%}
+                          <span class="text-success text-sm font-weight-bolder">+{{daily_growth_register}}</span> Than Last Week
+                          {%endif%}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <span style="font-size: 12px;">*Data delayed 1 Day and DAU & MAU updated every start of the week</span>
+      </div>
+    </div>
+    <div class="row mt-4">
+      <div class="col-lg-12 mb-lg-0 mb-4">
+        <div class="card z-index-2 h-100">
+          <div class="card-body p-3">
+            <div class="dau-mau">
+              <div id="chart_14" class="dau-mau-chart"></div>
+              <span style="font-size: 12px;">*Data updated every start of the week</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row mt-4">
+      <div class="col-lg-12 mb-lg-0 mb-4">
+        <div class="card z-index-2 h-100">
+          <div class="card-body p-3">
+            <div class="install-periods">
+              <div id="chart_11" class="install-chart"></div>
+              <span style="font-size: 12px;">*Data delayed 1 day</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row mt-4">
+      <div class="card card-frame">
+        <div class="card-body">
+          <h5 align="center">User Activity</h1>
+        </div>
+      </div>
+    </div>
+    <div class="row mt-4">
+      <div class="card card-frame">
+        <div class="card-body bg-deafult">
+          <div class="row">
+            <div class="col-sm-4 mb-xl-0 mb-2">
+              <div class="card">
+                <div class="card-body p-1">
+                  <div class="row">
+                    <div class="col-12">
+                      <div class="numbers">
+                        <p
+                          class="text-sm mb-1 text-uppercase font-weight-bold"
+                          align="center"
+                        >
+                          <b style="font-size: 11px;">Total Readers</b>
+                        </p>
+                        <h5 class="font-weight-bolder" align="center">
+                          <p>
+                            {{pembaca_period}}
+                          </p>
+                        </h5>
+                        <p class="mb-1" style="font-size:12px;" align="center">
+                          {% if '-' in dg_total_pembaca %}
+                          <span class="text-danger text-sm font-weight-bolder">{{dg_total_pembaca}}</span> than Last Periods
+                          {%else%}
+                          <span class="text-success text-sm font-weight-bolder">+{{dg_total_pembaca}}</span> than Last Periods
+                          {%endif%}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-4 mb-xl-0 mb-2">
+              <div class="card">
+                <div class="card-body p-1">
+                  <div class="row">
+                    <div class="col-12">
+                      <div class="numbers">
+                        <p
+                          class="text-sm mb-1 text-uppercase font-weight-bold"
+                          align="center"
+                        >
+                          <b style="font-size: 11px;">Guest Readers</b>
+                        </p>
+                        <h5 class="font-weight-bolder" align="center">
+                          <p>
+                            {{guest_reader}}
+                          </p>
+                        </h5>
+                        <p class="mb-1" style="font-size:12px;" align="center">
+                          {% if '-' in dg_guest_reader %}
+                          <span class="text-danger text-sm font-weight-bolder">{{dg_guest_reader}}</span> than Last Periods
+                          {%else%}
+                          <span class="text-success text-sm font-weight-bolder">+{{dg_guest_reader}}</span> than Last Periods
+                          {%endif%}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-4 mb-xl-0 mb-2">
+              <div class="card">
+                <div class="card-body p-1">
+                  <div class="row">
+                    <div class="col-12">
+                      <div class="numbers">
+                        <p
+                          class="text-sm mb-1 text-uppercase font-weight-bold"
+                          align="center"
+                        >
+                          <b style="font-size: 11px;">Register Readers</b>
+                        </p>
+                        <h5 class="font-weight-bolder" align="center">
+                          <p>
+                            {{register_reader}}
+                          </p>
+                        </h5>
+                        <p class="mb-1" style="font-size:12px;" align="center">
+                          {% if '-' in dg_register_reader %}
+                          <span class="text-danger text-sm font-weight-bolder">{{dg_register_reader}}</span> than Last Periods
+                          {%else%}
+                          <span class="text-success text-sm font-weight-bolder">+{{dg_register_reader}}</span> than Last Periods
+                          {%endif%}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <span style="font-size: 12px;">*Data delayed 1 day</span>
+      </div>
+    </div>
+    <div class="row mt-4">
+      <div class="card card-frame">
+        <div class="card-body bg-deafult">
+          <div class="row">
+            <div class="col-sm-3 mb-xl-0 mb-2">
+              <div class="card">
+                <div class="card-body p-1">
+                  <div class="row">
+                    <div class="col-12">
+                      <div class="numbers">
+                        <p
+                          class="text-sm mb-1 text-uppercase font-weight-bold"
+                          align="center"
+                        >
+                          <b style="font-size: 11px;">Coin Purchase</b>
+                        </p>
+                        <h5 class="font-weight-bolder" align="center">
+                          <p>
+                            {{beli_coin_week}}
+                          </p>
+                        </h5>
+                        <p class="mb-1" style="font-size:12px;" align="center">
+                          {% if '-' in dg_coin_period %}
+                          <span class="text-danger text-sm font-weight-bolder">{{dg_coin_period}}</span> than Last Periods
+                          {%else%}
+                          <span class="text-success text-sm font-weight-bolder">+{{dg_coin_period}}</span> than Last Periods
+                          {%endif%}
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -347,13 +342,80 @@ content %}
                           class="text-sm mb-1 text-uppercase font-weight-bold"
                           align="center"
                         >
-                          <b style="font-size: 12px;">Average Monthly Active Users Overall</b>
+                          <b style="font-size: 11px;">Unique Coin Purchase</b>
                         </p>
                         <h5 class="font-weight-bolder" align="center">
                           <p>
-                            {{mau_avg}}
+                            {{beli_coin_uniques}}
                           </p>
                         </h5>
+                        <p class="mb-1" style="font-size:12px;" align="center">
+                          {% if '-' in dg_coin_unique_period %}
+                          <span class="text-danger text-sm font-weight-bolder">{{dg_coin_unique_period}}</span> than Last Periods
+                          {%else%}
+                          <span class="text-success text-sm font-weight-bolder">+{{dg_coin_unique_period}}</span> than Last Periods
+                          {%endif%}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-3 mb-xl-0 mb-2">
+              <div class="card">
+                <div class="card-body p-1">
+                  <div class="row">
+                    <div class="col-12">
+                      <div class="numbers">
+                        <p
+                          class="text-sm mb-1 text-uppercase font-weight-bold"
+                          align="center"
+                        >
+                          <b style="font-size: 11px;">Novel Purchase</b>
+                        </p>
+                        <h5 class="font-weight-bolder" align="center">
+                          <p>
+                            {{beli_novel_week}}
+                          </p>
+                        </h5>
+                        <p class="mb-1" style="font-size:12px;" align="center">
+                          {% if '-' in dg_novel_period %}
+                          <span class="text-danger text-sm font-weight-bolder">{{dg_novel_period}}</span> than Last Periods
+                          {%else%}
+                          <span class="text-success text-sm font-weight-bolder">+{{dg_novel_period}}</span> than Last Periods
+                          {%endif%}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-3 mb-xl-0 mb-2">
+              <div class="card">
+                <div class="card-body p-1">
+                  <div class="row">
+                    <div class="col-12">
+                      <div class="numbers">
+                        <p
+                          class="text-sm mb-1 text-uppercase font-weight-bold"
+                          align="center"
+                        >
+                          <b style="font-size: 11px;">Unique Novel Purchase</b>
+                        </p>
+                        <h5 class="font-weight-bolder" align="center">
+                          <p>
+                            {{beli_novel_uniques}}
+                          </p>
+                        </h5>
+                        <p class="mb-1" style="font-size:12px;" align="center">
+                          {% if '-' in dg_novel_unique_period %}
+                          <span class="text-danger text-sm font-weight-bolder">{{dg_novel_unique_period}}</span> than Last Periods
+                          {%else%}
+                          <span class="text-success text-sm font-weight-bolder">+{{dg_novel_unique_period}}</span> than Last Periods
+                          {%endif%}
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -362,39 +424,155 @@ content %}
             </div>
           </div>
         </div>
+        <span style="font-size: 12px;">*Data delayed 1 day</span>
       </div>
     </div>
     <div class="row mt-4">
       <div class="col-lg-12 mb-lg-0 mb-4">
         <div class="card z-index-2 h-100">
           <div class="card-body p-3">
-            <div class="dau-mau">
-              <div id="chart_14" class="dau-mau-chart"></div>
+            <div class="user-journey">
+              <div id="chart_12" class="user-journey-chart"></div>
+              <span style="font-size: 12px;">*Data delayed 1 day</span>
             </div>
           </div>
         </div>
       </div>
     </div>
     <div class="row mt-4">
-      <div class="col-lg-12 mb-lg-0 mb-4">
-        <div class="card z-index-2 h-100">
-          <div class="card-body p-3">
-            <div class="chart-installs">
-              <div id="chart_13" class="chart-installs-1"></div>
-            </div>
-          </div>
+      <div class="card card-frame">
+        <div class="card-body">
+          <h5 align="center">Cost & Revenue</h1>
         </div>
       </div>
     </div>
     <div class="row mt-4">
-      <div class="col-lg-12 mb-lg-0 mb-4">
-        <div class="card z-index-2 h-100">
-          <div class="card-body p-3">
-            <div class="table-installs">
-              <div id="chart_12" class="table-installs-1"></div>
+      <div class="card card-frame">
+        <div class="card-body bg-deafult">
+          <div class="row">
+            <div class="col-sm-3 mb-xl-0 mb-2">
+              <div class="card">
+                <div class="card-body p-1">
+                  <div class="row">
+                    <div class="col-12">
+                      <div class="numbers">
+                        <p
+                          class="text-sm mb-1 text-uppercase font-weight-bold"
+                          align="center"
+                        >
+                          <b style="font-size: 11px;">Overall Cost</b>
+                        </p>
+                        <h5 class="font-weight-bolder" align="center">
+                          <p>
+                            {{installs_text}}
+                          </p>
+                        </h5>
+                        <p class="mb-1" style="font-size:12px;" align="center">
+                          {% if '-' in dg_installs %}
+                          <span class="text-danger text-sm font-weight-bolder">{{dg_installs}}</span> than Last Periods
+                          {%else%}
+                          <span class="text-success text-sm font-weight-bolder">+{{dg_installs}}</span> than Last Periods
+                          {%endif%}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-3 mb-xl-0 mb-2">
+              <div class="card">
+                <div class="card-body p-1">
+                  <div class="row">
+                    <div class="col-12">
+                      <div class="numbers">
+                        <p
+                          class="text-sm mb-1 text-uppercase font-weight-bold"
+                          align="center"
+                        >
+                          <b style="font-size: 11px;">Coin Purchase</b>
+                        </p>
+                        <h5 class="font-weight-bolder" align="center">
+                          <p>
+                            {{dau_avg_periods}}
+                          </p>
+                        </h5>
+                        <p class="mb-1" style="font-size:12px;" align="center">
+                          {% if '-' in dau_dg %}
+                          <span class="text-danger text-sm font-weight-bolder">{{dau_dg}}</span> than Yesterday
+                          {%else%}
+                          <span class="text-success text-sm font-weight-bolder">+{{dau_dg}}</span> than Yesterday
+                          {%endif%}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-3 mb-xl-0 mb-2">
+              <div class="card">
+                <div class="card-body p-1">
+                  <div class="row">
+                    <div class="col-12">
+                      <div class="numbers">
+                        <p
+                          class="text-sm mb-1 text-uppercase font-weight-bold"
+                          align="center"
+                        >
+                          <b style="font-size: 11px;">Revenue</b>
+                        </p>
+                        <h5 class="font-weight-bolder" align="center">
+                          <p>
+                            {{mau_avg_periods}}
+                          </p>
+                        </h5>
+                        <p class="mb-1" style="font-size:11px;" align="center">
+                          {% if '-' in mau_dg %}
+                          <span class="text-danger text-sm font-weight-bolder">{{mau_dg}}</span> than Yesterday
+                          {%else%}
+                          <span class="text-success text-sm font-weight-bolder">+{{mau_dg}}</span> than Yesterday
+                          {%endif%}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-3 mb-xl-0 mb-2">
+              <div class="card">
+                <div class="card-body p-1">
+                  <div class="row">
+                    <div class="col-12">
+                      <div class="numbers">
+                        <p
+                          class="text-sm mb-1 text-uppercase font-weight-bold"
+                          align="center"
+                        >
+                          <b style="font-size: 11px;">Average Revenue Per Transaction (ARPU)</b>
+                        </p>
+                        <h5 class="font-weight-bolder" align="center">
+                          <p>
+                            {{register_week.scalar()}}
+                          </p>
+                        </h5>
+                        <p class="mb-1" style="font-size:12px;" align="center">
+                          {% if '-' in daily_growth_register %}
+                          <span class="text-danger text-sm font-weight-bolder">{{daily_growth_register}}</span> Than Last Week
+                          {%else%}
+                          <span class="text-success text-sm font-weight-bolder">+{{daily_growth_register}}</span> Than Last Week
+                          {%endif%}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
+        <span style="font-size: 12px;">*Data delayed 1 Day and DAU & MAU updated every start of the week</span>
       </div>
     </div>
     <footer class="footer pt-3">
@@ -510,17 +688,14 @@ content %}
   </script>
   <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
   <script type="text/javascript">
-    var graphs_10 = {{inapp_chart | safe}};
-    Plotly.plot('chart_11',graphs_10,{});
-
-    var graphs_11 = {{table | safe}};
-    Plotly.plot('chart_12',graphs_11,{});
-
-    var graphs_12 = {{chart | safe}};
-    Plotly.plot('chart_13',graphs_12,{});
-
     var graphs_13 = {{dau_mau | safe}};
     Plotly.plot('chart_14',graphs_13,{});
+
+    var graphs_11 = {{chart_install | safe}};
+    Plotly.plot('chart_11',graphs_11,{});
+
+    var graphs_12 = {{user_journey_chart | safe}};
+    Plotly.plot('chart_12',graphs_12,{});
   </script>
 </main>
 {% endblock %}

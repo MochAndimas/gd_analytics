@@ -1,8 +1,12 @@
 """functions file dashboard"""
 
 from __future__ import division
+import time
 import json
+import io
+import requests
 import pandas as pd
+import csv
 import plotly
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
@@ -13,14 +17,71 @@ from sqlalchemy import desc, asc
 from apps.authentication.models import GooddreamerNovel as gn, GooddreamerUserNovelProgression as gunp, GooddreamerNovelTransaction as gnt
 from apps.authentication.models import GooddreamerTransactionDetails as gtd, GooddreamerTransaction as gt, DataCategory as dc
 from apps.authentication.models import PivotNovelCategory as pnc, Account as ac, AppsflyerAggregatedData as aad
+from decouple import config
 
 
-def read_query(text):
-    """conevert query statement into pandas"""
+DEBUG = config('DEBUG', default=True, cast=bool)
+API_KEY = "eyJhbGciOiJBMjU2S1ciLCJjdHkiOiJKV1QiLCJlbmMiOiJBMjU2R0NNIiwidHlwIjoiSldUIiwiemlwIjoiREVGIn0.lDtMMOAHflCVpKgMGT-YoGcoye63SVLaPFtELQMDwW-S3r_sDJPJeg._VsaR7Cznd1wABto.DYNLvy86hQQbR4QQR0QTdIbipaZjr1EBDDQ3m-lHsIhbGhPSS8Zp3WDu0tsT1drd49-eU3Ek08LcdRM5V1z0zCZxurcFMmT4o1tpLZqOFHa85Ypj9-pTPpzVUNYN0Q7BAx9eXq7AHbgYtdXiNHeLcYtzam99UzkcaAQFmMlEqPPjRpRPY5eslkbBFX4mpRuIzfwiPFyUoCvs4e1zHjHxSBspIj5ESvswXZvT7EtvWgIFjLVZewEp-QopSMHyj9PxEm2J0Q5IeO2LfFrADr_z0YD87mKvUcUIHzQW4PjEVhOWvgPqgWjw6NHb_6-TXiWScgXdqKSjc4XxSZDq4X-G-ESzefHPEOZIM_mnKbqMtyNldgST53duL-0fMD0__SM_JJ24wIJXdLRijQpd9YqWf4267qE4b6RXCFL0gNM7UUKCfT52FBN_KANVmXZobhWta438g8qxVxONkTI0f2fBgFZqLmjubPOwiRqIVFZJIX38W0fN5AYjMaimRxmMfvbH_pTXSl2NqhD9bby6bYw.0bdVe3QKqkywFOr43kDzPQ"
+APP_ID = "id.gooddreamer.novel"
 
-    file = pd.read_sql(sql=text, con=db.engine.connect())
 
-    return file
+def get_appsflyer_data(api_token, app_id, start_date, end_date, data_type):
+    """
+    Retrieves raw data from Appsflyer API and converts it into a Pandas dataframe.
+
+    Parameters:
+        api_token (str): Appsflyer API token
+        app_id (str): App ID
+        start_date (str): Start date in YYYY-MM-DD format
+        end_date (str): End date in YYYY-MM-DD format
+
+    Returns:
+        Pandas dataframe: Raw data from Appsflyer API
+    """
+
+    # Set API endpoint URL
+    endpoint = f"https://hq1.appsflyer.com/api/raw-data/export/app/{app_id}/{data_type}/v5?from={start_date}&to={end_date}&reattr=false&additional_fields=device_category"
+
+    # Set request headers
+    headers = {
+        "authorization": api_token,
+        "accept": "text/csv"
+    }
+    if DEBUG:
+        response = None
+    else:
+        # Send API request
+        response = requests.get(endpoint, headers=headers)
+
+        # Convert response content into Pandas dataframe and save into csv
+        df = pd.read_csv(io.StringIO(response.content.decode('utf-8')))
+        df.to_csv(f'update_{data_type}.csv', index=False)
+
+    # parsing colum date
+    dates_col = ["Install Time"]
+    pars_date = pd.read_csv(f'./{data_type}.csv', index_col=False, parse_dates=dates_col, low_memory=False)
+    df = pd.DataFrame(pars_date)
+
+    # format datetime into date only
+    last1days = datetime.datetime.today() - datetime.timedelta(1)
+    last1days_date = last1days.date()
+    df['Install Time'] = pd.to_datetime(df['Install Time']).dt.date
+
+    # Check if the CSV file already has data for today and append into report file
+    if DEBUG is not True:
+        if last1days_date in df["Install Time"].values:
+            return 'data is uptodate!'
+        else:
+            with open(f'./update_{data_type}.csv', 'r') as csv_file:
+                reader = csv.reader(csv_file)
+                data_to_append = [row for row in reader]
+            
+            with open(f'./{data_type}.csv', 'a', newline='') as csv_file:
+                writer = csv.writer(csv_file)
+                writer.writerows(data_to_append[1:])
+            return 'data must be updated!'
+    else:
+        return df
 
 
 def pembaca_pgnt(from_date='2023-01-01', to_date='2023-02-06'):
@@ -397,34 +458,6 @@ def daily_growth_pembaca(from_date=None, to_date=None):
     return txt
 
 
-def daily_growth_pembaca_week():
-    """daily growth pembaca"""
-    last2day = datetime.datetime.today() - datetime.timedelta(2)
-    las8days = datetime.datetime.today() - datetime.timedelta(8)
-    last9days = datetime.datetime.today() - datetime.timedelta(9)
-    last15days = datetime.datetime.today() - datetime.timedelta(15)
-    last2day_date = last2day.date()
-    last8days_date = las8days.date()
-    last9days_date = last9days.date()
-    last15days_date = last15days.date()
-
-    week1 = db.session.query(
-        db.func.count(gunp.id).label('today')
-    ).filter(db.func.date(gunp.create_at).between(last8days_date, last2day_date)).scalar()
-    week2 = db.session.query(
-        db.func.count(gunp.id).label('yesterday')
-    ).filter(db.func.date(gunp.create_at).between(last15days_date, last9days_date)).scalar()
-
-    if week1 == 0:
-        growth = 0
-    else:
-        growth = (week1-week2)/week1
-
-    txt = "{:.0%}".format(growth)
-
-    return txt
-
-
 def daily_growth_pembeli(from_date=None, to_date=None):
     """daily growth pembeli"""
 
@@ -445,34 +478,6 @@ def daily_growth_pembeli(from_date=None, to_date=None):
     return txt
 
 
-def daily_growth_pembeli_week():
-    """daily growth pembeli"""
-    last2day = datetime.datetime.today() - datetime.timedelta(2)
-    las8days = datetime.datetime.today() - datetime.timedelta(8)
-    last9days = datetime.datetime.today() - datetime.timedelta(9)
-    last15days = datetime.datetime.today() - datetime.timedelta(15)
-    last2day_date = last2day.date()
-    last8days_date = las8days.date()
-    last9days_date = last9days.date()
-    last15days_date = last15days.date()
-
-    week1 = db.session.query(
-        db.func.count(gnt.id).label('today')
-    ).filter(db.func.date(gnt.created_at).between(last8days_date, last2day_date)).scalar()
-    week2 = db.session.query(
-        db.func.count(gnt.id).label('yesterday')
-    ).filter(db.func.date(gnt.created_at).between(last15days_date, last9days_date)).scalar()
-
-    if week1 == 0:
-        growth = 0
-    else:
-        growth = (week1-week2)/week1
-
-    txt = "{:.0%}".format(growth)
-
-    return txt
-
-
 def daily_growth_coin(transaction_status=0, from_date=None, to_date=None):
     """daily growth coin. 0 = Pending, 1 = Success, 2 = Expired"""
 
@@ -483,35 +488,7 @@ def daily_growth_coin(transaction_status=0, from_date=None, to_date=None):
         db.func.count(gt.id).label('yesterday')
     ).filter(db.func.date(gt.created_at) == from_date, gt.transaction_status == transaction_status).scalar()
 
-    if today == 0:
-        growth = 0
-    else:
-        growth = (today-yesterday)/today
-
-    txt = "{:.0%}".format(growth)
-
-    return
-
-
-def daily_growth_coin_week(transaction_status=0):
-    """daily growth coin. 0 = Pending, 1 = Success, 2 = Expired"""
-    last2day = datetime.datetime.today() - datetime.timedelta(2)
-    las8days = datetime.datetime.today() - datetime.timedelta(8)
-    last9days = datetime.datetime.today() - datetime.timedelta(9)
-    last15days = datetime.datetime.today() - datetime.timedelta(15)
-    last2day_date = last2day.date()
-    last8days_date = las8days.date()
-    last9days_date = last9days.date()
-    last15days_date = last15days.date()
-
-    today = db.session.query(
-        db.func.count(gt.id).label('today')
-    ).filter(db.func.date(gt.created_at).between(last8days_date, last2day_date), gt.transaction_status == transaction_status).scalar()
-    yesterday = db.session.query(
-        db.func.count(gt.id).label('yesterday')
-    ).filter(db.func.date(gt.created_at).between(last15days_date, last9days_date), gt.transaction_status == transaction_status).scalar()
-
-    if today == 0:
+    if today == 0 or yesterday == 0:
         growth = 0
     else:
         growth = (today-yesterday)/today
@@ -616,54 +593,20 @@ def coin_days(from_date='2023-01-01', to_date='2023-02-06'):
     return chart
 
 
-def dg_app_event(event=None):
-    """daily growth install"""
-    last2day = datetime.datetime.today() - datetime.timedelta(2)
-    las8days = datetime.datetime.today() - datetime.timedelta(8)
-    last9days = datetime.datetime.today() - datetime.timedelta(9)
-    last15days = datetime.datetime.today() - datetime.timedelta(15)
-    last2day_date = last2day.date()
-    last8days_date = las8days.date()
-    last9days_date = last9days.date()
-    last15days_date = last15days.date()
-
-    week1 = db.session.query(
-        db.func.sum(event)
-    ).filter(aad.date.between(last8days_date, last2day_date)).scalar()
-    week2 = db.session.query(
-        db.func.sum(event)
-    ).filter(aad.date.between(last15days_date, last9days_date)).scalar()
-
-    if week1 == None:
-        growth = 0
-    else:
-        growth = (week1-week2)/week1
-
-    txt = "{:.0%}".format(growth)
-
-    return txt
-
-
-def dg_register():
+def dg_register(from_date=None, to_date=None):
     """daily growth register"""
-    last2day = datetime.datetime.today() - datetime.timedelta(2)
-    las8days = datetime.datetime.today() - datetime.timedelta(8)
-    last9days = datetime.datetime.today() - datetime.timedelta(9)
-    last15days = datetime.datetime.today() - datetime.timedelta(15)
-    last2day_date = last2day.date()
-    last8days_date = las8days.date()
-    last9days_date = last9days.date()
-    last15days_date = last15days.date()
+    fromdate_lastweek = from_date - datetime.timedelta(7)
+    todate_lastweek = to_date - datetime.timedelta(7)
 
     week1 = db.session.query(
         db.func.count(ac.id)
-    ).filter(db.func.date(ac.registered_at).between(last8days_date, last2day_date), ac.is_guest == 0).scalar()
+    ).filter(db.func.date(ac.registered_at).between(from_date, to_date), ac.is_guest == 0).scalar()
 
     week2 = db.session.query(
         db.func.count(ac.id)
-    ).filter(db.func.date(ac.registered_at).between(last15days_date, last9days_date), ac.is_guest == 0).scalar()
+    ).filter(db.func.date(ac.registered_at).between(fromdate_lastweek, todate_lastweek), ac.is_guest == 0).scalar()
 
-    if week1 == None:
+    if week1 == 0 or week2 == 0:
         growth = 0
     else:
         growth = (week1 - week2)/week1
@@ -673,33 +616,14 @@ def dg_register():
     return txt
 
 
-def af(from_date=None, to_date=None):
-    """Appsfyer event last week"""
-    query_af_w1 = db.session.query(
-        db.func.sum(aad.installs).label('installs'),
-        db.func.sum(aad.af_preview_novel_counter).label('preview_novel'),
-        db.func.sum(aad.af_topup_coin_counter).label('klik_topup_koin')
-    ).filter(db.func.date(aad.date).between(from_date, to_date))
-
-    return query_af_w1
-
-
 def register(from_date=None, to_date=None):
     """total register last week"""
+
     reg = db.session.query(
         db.func.count(ac.id).label('register')
     ).filter(db.func.date(ac.registered_at).between(from_date, to_date), ac.is_guest == 0)
 
     return reg
-
-
-def baca_novel(from_date=None, to_date=None):
-    """baca novel last week"""
-    baca_novel_w1 = db.session.query(
-        db.func.count(gunp.user_id).label('pembaca_novel')
-    ).filter(db.func.date(gunp.create_at).between(from_date, to_date))
-
-    return baca_novel_w1
 
 
 def beli_coin(from_date=None, to_date=None):
@@ -711,6 +635,54 @@ def beli_coin(from_date=None, to_date=None):
     return beli_coin_w1
 
 
+def beli_coin_unique(from_date=None, to_date=None):
+    """beli coin unique"""
+    beli_coin_w1 = db.session.query(
+        gt.user_id.distinct().label('beli_coin')
+    ).filter(db.func.date(gt.created_at).between(from_date, to_date), gt.transaction_status == 1)
+
+    df = pd.DataFrame(beli_coin_w1)
+    count = df['beli_coin'].count()
+
+    return count
+
+
+def dg_coin_periods(from_date=None, to_date=None):
+    """daily growth pembelian coin"""
+
+    fromdate_lastweek = from_date - datetime.timedelta(7)
+    todate_lastweek = to_date - datetime.timedelta(7) 
+
+    w1 = beli_coin(from_date=from_date, to_date=to_date).scalar()
+    w2 = beli_coin(from_date=fromdate_lastweek, to_date=todate_lastweek).scalar()
+
+    if w1 == 0:
+        dg = 0
+    else:
+        dg = (w1-w2)/w1
+
+    txt = "{:.0%}".format(dg)
+
+    return txt
+
+
+def dg_coin_unique_periods(from_date=None, to_date=None):
+    """daily growth pembelian coin unique"""
+    fromdate_lastweek = from_date - datetime.timedelta(7)
+    todate_lastweek = to_date - datetime.timedelta(7) 
+
+    w1 = beli_coin_unique(from_date=from_date, to_date=to_date)
+    w2 = beli_coin_unique(from_date=fromdate_lastweek, to_date=todate_lastweek)
+
+    if w1 == 0:
+        dg = 0
+    else:
+        dg = (w1-w2)/w1
+
+    txt = "{:.0%}".format(dg)
+
+    return txt
+
 def beli_novel(from_date=None, to_date=None):
     """beli_novel last week"""
     beli_novel_w1 = db.session.query(
@@ -720,119 +692,60 @@ def beli_novel(from_date=None, to_date=None):
     return beli_novel_w1
 
 
-def in_app_chart():
-    """in app chart"""
+def beli_novel_unique(from_date=None, to_date=None):
+    """beli_novel last week"""
+    beli_novel_w1 = db.session.query(
+        gnt.user_id.distinct().label('user')
+    ).filter(db.func.date(gnt.created_at).between(from_date, to_date))
 
-    last2days = datetime.datetime.today() - datetime.timedelta(2)
-    last8days = datetime.datetime.today() - datetime.timedelta(8)
-    last9days = datetime.datetime.today() - datetime.timedelta(9)
-    last15days = datetime.datetime.today() - datetime.timedelta(15)
-    last2days_date = last2days.date()
-    last8days_date = last8days.date()
-    last9days_date = last9days.date()
-    last15days_date = last15days.date()
-
-    df_af_w1 = pd.DataFrame(
-        af(from_date=last8days_date, to_date=last2days_date))
-    df_af_w2 = pd.DataFrame(
-        af(from_date=last15days_date, to_date=last9days_date))
-    df_reg_w1 = pd.DataFrame(
-        register(from_date=last8days_date, to_date=last2days_date))
-    df_reg_w2 = pd.DataFrame(
-        register(from_date=last15days_date, to_date=last9days_date))
-    df_pembaca_w1 = pd.DataFrame(baca_novel(
-        from_date=last8days_date, to_date=last2days_date))
-    df_pembaca_w2 = pd.DataFrame(baca_novel(
-        from_date=last15days_date, to_date=last9days_date))
-    df_coin_w1 = pd.DataFrame(
-        beli_coin(from_date=last8days_date, to_date=last2days_date))
-    df_coin_w2 = pd.DataFrame(
-        beli_coin(from_date=last15days_date, to_date=last9days_date))
-    df_pembeli_w1 = pd.DataFrame(beli_novel(
-        from_date=last8days_date, to_date=last2days_date))
-    df_pembeli_w2 = pd.DataFrame(beli_novel(
-        from_date=last15days_date, to_date=last9days_date))
-
-    xaxes_w1 = [df_pembeli_w1.beli_novel.values[0], df_coin_w1.beli_coin.values[0], df_af_w1.klik_topup_koin.values[0],
-                df_reg_w1.register.values[0], df_pembaca_w1.pembaca_novel.values[0], df_af_w1.preview_novel.values[0], df_af_w1.installs.values[0]]
-    xaxes_w2 = [df_pembeli_w2.beli_novel.values[0], df_coin_w2.beli_coin.values[0], df_af_w2.klik_topup_koin.values[0],
-                df_reg_w2.register.values[0], df_pembaca_w2.pembaca_novel.values[0], df_af_w2.preview_novel.values[0], df_af_w2.installs.values[0]]
-    yaxes = ['beli_novel', 'beli_coin', 'klik_topup_coin',
-             'register', 'pembaca_novel', 'preview_novel', 'installs']
-
-    fig = go.Figure(data=[
-        go.Bar(name=f'{last8days_date} - {last2days_date}', y=yaxes, x=xaxes_w1,
-               orientation='h', marker=dict(color='red'), text=xaxes_w1, textposition='outside'),
-        go.Bar(name=f'{last15days_date} - {last9days_date}', y=yaxes, x=xaxes_w2,
-               orientation='h', marker=dict(color='blue'), text=xaxes_w2, textposition='outside')
-    ], layout=dict(height=650))
-
-    fig.update_layout(title='App Events /7 Days Periods',
-                      barmode='group', legend_title_text="Periods")
-    fig.update_xaxes(title='value_counts')
-    fig.update_yaxes(title='Events', categoryorder='array', categoryarray=[
-        'beli_novel', 'beli_coin', 'klik_topup_coin', 'register', 'pembaca_novel', 'preview_novel', 'installs'
-    ])
-    chart = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
-
-    return chart
+    df = pd.DataFrame(beli_novel_w1)
+    count = df['user'].count()
+    
+    return count
 
 
-def install_media_source_table(from_date='2023-01-09', to_date='2023-01-30'):
-    """install by media source table"""
+def dg_novel_periods(from_date=None, to_date=None):
+    """daily growth pembelian novel periods"""
+    fromdate_lastweek = from_date - datetime.timedelta(7)
+    todate_lastweek = to_date - datetime.timedelta(7)
 
-    query = db.session.query(
-        aad.date.label('date'),
-        aad.media_source.label('media_source'),
-        aad.campaign.label('campaign'),
-        aad.installs.label('installs')
-    ).filter(db.func.date(aad.date).between(from_date, to_date)).order_by(desc('date'))
+    w1 = beli_novel(from_date=from_date, to_date=to_date).scalar()
+    w2 = beli_novel(from_date=fromdate_lastweek, to_date=todate_lastweek).scalar()
+    
+    if w1 == 0:
+        dg = 0
+    else:
+        dg = (w1-w2)/w1
 
-    df = pd.DataFrame(query)
+    txt = "{:.0%}".format(dg)
 
-    fig = go.Figure(data=[
-        go.Table(header=dict(values=df.columns),
-                 cells=dict(values=[df.date.values, df.media_source, df.campaign, df.installs]))
-    ])
-    fig.update_layout(title='Installs By Media Source')
-
-    chart = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
-
-    return chart
+    return txt
 
 
-def install_media_source_chart(from_date='2023-01-09', to_date='2023-01-30'):
-    """installs by media source chart"""
+def dg_novel_unique_periods(from_date=None, to_date=None):
+    """daily growth pembelian novel periods"""
+    fromdate_lastweek = from_date - datetime.timedelta(7)
+    todate_lastweek = to_date - datetime.timedelta(7)
 
-    query = db.session.query(
-        aad.media_source.distinct().label('media_source'),
-        db.func.sum(aad.installs).over(
-            partition_by=aad.media_source).label('installs')
-    ).filter(db.func.date(aad.date).between(from_date, to_date), aad.installs != 0)
+    w1 = beli_novel_unique(from_date=from_date, to_date=to_date)
+    w2 = beli_novel_unique(from_date=fromdate_lastweek, to_date=todate_lastweek)
 
-    df = pd.DataFrame(query)
+    if w1 == 0:
+        dg = 0
+    else:
+        dg = (w1-w2)/w1
 
-    fig = go.Figure(
-        go.Bar(x=df.media_source, y=df.installs,
-               text=df.installs, textposition='outside')
-    )
+    txt = "{:.0%}".format(dg)
 
-    fig.update_layout(title='Installs By Media Source')
-    fig.update_xaxes(title='Media Source')
-    fig.update_yaxes(title='Installs')
-
-    chart = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
-
-    return chart
+    return txt
 
 
 def dau_mau_chart(from_date='2023-01-09', to_date='2023-02-23'):
     """DAU & MAU chart"""
 
     df = pd.read_csv('./dau&mau.csv', delimiter=';')
-
-    filtered_df = df[(df['date'] >= str(from_date))
-                     & (df['date'] <= str(to_date))]
+    df['date'] = pd.to_datetime(df['date']).dt.date
+    filtered_df = df[(df['date'] >= from_date) & (df['date'] <= to_date)]
 
     # Create figure with secondary y-axis
     fig = make_subplots(specs=[[{"secondary_y": True}]])
@@ -847,7 +760,7 @@ def dau_mau_chart(from_date='2023-01-09', to_date='2023-02-23'):
         secondary_y=True
     )
     fig.update_layout(title='DAU & MAU /Days')
-    fig.update_xaxes(title='Date')
+    fig.update_xaxes(title='Date', dtick='D1')
     fig.update_yaxes(title='Active Users')
 
     chart = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
@@ -855,28 +768,51 @@ def dau_mau_chart(from_date='2023-01-09', to_date='2023-02-23'):
     return chart
 
 
-def dau_mau_sum_text(from_date=None, to_date=None, column=None):
-    """DAU & MAU text"""
+def install_chart(from_date=None, to_date=None):
+    """install chart"""
+    non_organic_csv = pd.read_csv('./installs_report.csv', index_col=False, low_memory=False)
+    non_organic_df = pd.DataFrame(non_organic_csv)
 
-    df = pd.read_csv('./dau&mau.csv', delimiter=';')
+    organic_csv = pd.read_csv('./organic_installs_report.csv', index_col=False)
+    organic_df = pd.DataFrame(organic_csv)
 
-    w1 = df[(df['date'] >= str(from_date)) & (df['date'] <= str(to_date))]
+    non_organic_df['Install Time'] = pd.to_datetime(non_organic_df['Install Time']).dt.date
+    organic_df['Install Time'] = pd.to_datetime(organic_df['Install Time']).dt.date
 
-    sums = w1[column].sum()
+    non_organic_filter = non_organic_df[(non_organic_df['Install Time'] >= from_date)&
+                                        (non_organic_df['Install Time'] <= to_date)]
+    organic_filter = organic_df[(organic_df['Install Time'] >= from_date)&
+                                        (organic_df['Install Time'] <= to_date)] 
 
-    return sums
+    df_non_organic = non_organic_filter.groupby(['Install Time'])['Install Time'].count()
+    df_organic = organic_filter.groupby(['Install Time'])['Install Time'].count()
+
+    df_1 = pd.DataFrame(df_non_organic)
+    df_2 = pd.DataFrame(df_organic)
+
+    fig = go.Figure(data=[
+        go.Bar(x=df_1.index.values, y=df_1['Install Time'], name='Non Organic', text=df_1['Install Time'], textposition='inside'),
+        go.Bar(x=df_2.index.values, y=df_2['Install Time'], name='Organic', text=df_2['Install Time'], textposition='inside')
+    ])
+    fig.update_layout(title='Installs /Days', barmode='stack')
+    fig.update_xaxes(title='Date', dtick='D1')
+    fig.update_yaxes(title='Total install')
+
+    chart = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
+
+    return chart
 
 
 def dau_mau_avg_text(from_date=None, to_date=None, column=None):
     """DAU & MAU text"""
 
     df = pd.read_csv('./dau&mau.csv', delimiter=';')
+    df['date'] = pd.to_datetime(df['date']).dt.date
+    w1 = df[(df['date'] >= from_date) & (df['date'] <= to_date)]
 
-    w1 = df[(df['date'] >= str(from_date)) & (df['date'] <= str(to_date))]
+    mean = w1[column].mean()
 
-    sums = w1[column].mean()
-
-    return sums
+    return mean
 
 
 def pembaca_pembeli_month(from_date='2023-01-01'):
@@ -900,10 +836,10 @@ def pembaca_pembeli_month(from_date='2023-01-01'):
     df_pembaca = pd.DataFrame(query_2)
 
     fig = go.Figure(data=[
-        go.Bar(x=df_pembeli.periods, y=df_pembeli.pembeli_novel,
-               text=df_pembeli.pembeli_novel, textposition='outside', name='pembeli_novel'),
         go.Bar(x=df_pembaca.periods, y=df_pembaca.pembaca_novel,
-               text=df_pembaca.pembaca_novel, textposition='outside', name='pembaca_novel')
+               text=df_pembaca.pembaca_novel, textposition='outside', name='pembaca_novel'),
+        go.Bar(x=df_pembeli.periods, y=df_pembeli.pembeli_novel,
+               text=df_pembeli.pembeli_novel, textposition='outside', name='pembeli_novel')
     ])
 
     fig.update_layout(title='Pembaca & Pembeli /Month')
@@ -978,6 +914,165 @@ def transaction_coin_month(from_date='2023-01-01'):
     fig.update_layout(title='Transaction Coin /Month')
     fig.update_xaxes(title='Periods')
     fig.update_yaxes(title='Transaction Coin')
+
+    chart = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
+
+    return chart
+
+
+def af_installs(from_date=None, to_date=None):
+    """af_installs by periods events"""
+
+    last1days = datetime.datetime.today() - datetime.timedelta(1)
+    last1days_date = last1days.date()
+    
+    #update data
+    get_appsflyer_data(api_token=API_KEY, app_id=APP_ID, data_type='installs_report', start_date=last1days_date, end_date=last1days_date)
+    get_appsflyer_data(api_token=API_KEY, app_id=APP_ID, data_type='organic_installs_report', start_date=last1days_date, end_date=last1days_date)
+
+    non_organic_csv = pd.read_csv('./installs_report.csv', index_col=False, low_memory=False)
+    non_organic_df = pd.DataFrame(non_organic_csv)
+
+    organic_csv = pd.read_csv('./organic_installs_report.csv', index_col=False)
+    organic_df = pd.DataFrame(organic_csv)
+
+    non_organic_df['Install Time'] = pd.to_datetime(non_organic_df['Install Time']).dt.date
+    organic_df['Install Time'] = pd.to_datetime(organic_df['Install Time']).dt.date
+
+    non_organic_filter = non_organic_df[(non_organic_df['Install Time'] >= from_date)&
+                                        (non_organic_df['Install Time'] <= to_date)]
+    organic_filter = organic_df[(organic_df['Install Time'] >= from_date)&
+                                        (organic_df['Install Time'] <= to_date)]
+
+    count = non_organic_filter['Install Time'].count() + organic_filter['Install Time'].count()
+    
+    return count
+
+
+def dg_af_installs(from_date=None, to_date=None):
+    """daily growth installs"""
+    fromdate_lastweek = from_date - datetime.timedelta(7)
+    todate_lastweek = to_date - datetime.timedelta(7)
+
+    non_organic_csv = pd.read_csv('./installs_report.csv', index_col=False, low_memory=False)
+    non_organic_df = pd.DataFrame(non_organic_csv)
+
+    organic_csv = pd.read_csv('./organic_installs_report.csv', index_col=False)
+    organic_df = pd.DataFrame(organic_csv)
+
+    non_organic_df['Install Time'] = pd.to_datetime(non_organic_df['Install Time']).dt.date
+    organic_df['Install Time'] = pd.to_datetime(organic_df['Install Time']).dt.date
+
+    non_organic_filter_w1 = non_organic_df[(non_organic_df['Install Time'] >= from_date)&
+                                    (non_organic_df['Install Time'] <= to_date)]
+    non_organic_filter_w2 = non_organic_df[(non_organic_df['Install Time'] >= fromdate_lastweek)&
+                                    (non_organic_df['Install Time'] <= todate_lastweek)]
+    
+    organic_filter_w1 = organic_df[(organic_df['Install Time'] >= from_date)&
+                                    (organic_df['Install Time'] <= to_date)]
+    organic_filter_w2 = organic_df[(organic_df['Install Time'] >= fromdate_lastweek)&
+                                    (organic_df['Install Time'] <= todate_lastweek)]
+    
+    count_w1 = non_organic_filter_w1['Install Time'].count() + organic_filter_w1['Install Time'].count()
+    count_w2 = non_organic_filter_w2['Install Time'].count() + organic_filter_w2['Install Time'].count()
+
+    dg = (count_w1 - count_w2)/count_w1
+
+    txt = "{:.0%}".format(dg)
+    
+
+    return txt
+
+
+def pembaca_periods(from_date=None, to_date=None):
+    """total Pembaca per periods return text"""
+
+    query = db.session.query(
+        db.func.count(gunp.id).label('total_pembaca')
+    ).filter(db.func.date(gunp.create_at).between(from_date, to_date)).scalar()
+
+    return query
+
+
+def guest_register_reader_periods(from_date=None, to_date=None, is_guest=None):
+    """guest or register readers per periods text
+    0 = registered
+    1 = guest 
+    """
+
+    query = db.session.query(
+        db.func.count(gunp.id).label('total_pembaca')
+    ).join(ac, gunp.user_id == ac.id).filter(db.func.date(gunp.create_at).between(from_date, to_date), ac.is_guest == is_guest).scalar()
+
+    return query
+
+
+def dg_pembaca_periods(from_date=None, to_date=None):
+    """daily growth tota; pembaca per periods"""
+
+    fromdate_lastweek = from_date - datetime.timedelta(7)
+    todate_lastweek = to_date - datetime.timedelta(7)  
+
+    w1 = pembaca_periods(from_date=from_date, to_date=to_date)
+    w2 = pembaca_periods(from_date=fromdate_lastweek, to_date=todate_lastweek)
+    
+    dg = (w1-w2)/w1
+
+    txt = "{:.0%}".format(dg)
+
+    return txt
+
+
+def dg_guest_register_reader(from_date=None, to_date=None, is_guest=None):
+    """daily growth guest reader"""
+
+    fromdate_lastweek = from_date - datetime.timedelta(7)
+    todate_lastweek = to_date - datetime.timedelta(7) 
+
+    w1 = guest_register_reader_periods(from_date=from_date, to_date=to_date, is_guest=is_guest)
+    w2 = guest_register_reader_periods(from_date=fromdate_lastweek, to_date=todate_lastweek, is_guest=is_guest)
+
+    if w1 == 0:
+        dg = 0
+    else:
+        dg = (w1-w2)/w1
+
+    txt = "{:.0%}".format(dg)
+
+    return txt
+
+
+def user_activity(from_date=None, to_date=None):
+    """user activity chart"""
+
+    coin_query = db.session.query(
+        db.func.date(gt.created_at).distinct().label('date'),
+        db.func.count(gt.id).over(partition_by=db.func.date(gt.created_at)).label('total_pembelian')
+    ).filter(db.func.date(gt.created_at).between(from_date, to_date), gt.transaction_status == 1)
+
+    register_reader_query = db.session.query(
+        db.func.date(gunp.create_at).distinct().label('date'),
+        db.func.count(gunp.id).over(partition_by=db.func.date(gunp.create_at)).label('total_registered_pembaca')
+    ).join(ac, gunp.user_id == ac.id).filter(db.func.date(gunp.create_at).between(from_date, to_date), ac.is_guest == 0)
+
+    novel_buyer_query = db.session.query(
+        db.func.date(gnt.created_at).distinct().label('date'),
+        db.func.count(gnt.id).over(partition_by=db.func.date(gnt.created_at)).label('total_pembelian')
+    ).filter(db.func.date(gnt.created_at).between(from_date, to_date))
+
+    coin_df = pd.DataFrame(coin_query)
+    register_reader_df = pd.DataFrame(register_reader_query)
+    novel_buyer_df = pd.DataFrame(novel_buyer_query)
+
+    fig = go.Figure(data=[
+        go.Bar(x=register_reader_df.date, y=register_reader_df.total_registered_pembaca, name='Registered Reader'),
+        go.Bar(x=coin_df.date, y=coin_df.total_pembelian, name='Coin Purchase'),
+        go.Bar(x=novel_buyer_df.date, y=novel_buyer_df.total_pembelian, name='Novel Purchase')
+    ])
+
+    fig.update_layout(title='User Journey')
+    fig.update_xaxes(title='Date', dtick='D1')
+    fig.update_yaxes(title='Total Pembelian')
 
     chart = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
 

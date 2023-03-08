@@ -14,7 +14,7 @@ class Config(object):
     SECRET_KEY = config('SECRET KEY', default='rcd32011')
 
     # DB_staging
-    SQLALCHEMY_DATABASE_URI = 'mysql://goodDBU:DBgo0dDr3am3r1@128.199.190.48:3306/gdDB_dummy'
+    SQLALCHEMY_DATABASE_URI = 'mysql://goodDBU:DBgo0dDr3am3r3@34.101.185.240:3306/gdDB_live'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 
