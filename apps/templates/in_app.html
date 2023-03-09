@@ -53,7 +53,7 @@ content %}
                           class="text-sm mb-1 text-uppercase font-weight-bold"
                           align="center"
                         >
-                          <b style="font-size: 11px;">Installs</b>
+                          <b style="font-size: 11px;" data-toggle="tooltip" data-placement="top" title="Jumlah install pada periode yang dipilih">Installs</b>
                         </p>
                         <h5 class="font-weight-bolder" align="center">
                           <p>
@@ -62,9 +62,9 @@ content %}
                         </h5>
                         <p class="mb-1" style="font-size:12px;" align="center">
                           {% if '-' in dg_installs %}
-                          <span class="text-danger text-sm font-weight-bolder">{{dg_installs}}</span> than Last Periods
+                          <span class="text-danger text-sm font-weight-bolder">{{dg_installs}}</span> Than Last Periods
                           {%else%}
-                          <span class="text-success text-sm font-weight-bolder">+{{dg_installs}}</span> than Last Periods
+                          <span class="text-success text-sm font-weight-bolder">+{{dg_installs}}</span> Than Last Periods
                           {%endif%}
                         </p>
                       </div>
@@ -83,7 +83,7 @@ content %}
                           class="text-sm mb-1 text-uppercase font-weight-bold"
                           align="center"
                         >
-                          <b style="font-size: 11px;">Average Daily Active Users (DAU)</b>
+                          <b style="font-size: 11px;" data-toggle="tooltip" data-placement="top" title="Rata-rata user (unique) yang membuka aplikasi / website pada hari yang dipilih sesuai periode">Average Daily Active Users (DAU)</b>
                         </p>
                         <h5 class="font-weight-bolder" align="center">
                           <p>
@@ -92,9 +92,9 @@ content %}
                         </h5>
                         <p class="mb-1" style="font-size:12px;" align="center">
                           {% if '-' in dau_dg %}
-                          <span class="text-danger text-sm font-weight-bolder">{{dau_dg}}</span> than Yesterday
+                          <span class="text-danger text-sm font-weight-bolder">{{dau_dg}}</span> Than Last Periods
                           {%else%}
-                          <span class="text-success text-sm font-weight-bolder">+{{dau_dg}}</span> than Yesterday
+                          <span class="text-success text-sm font-weight-bolder">+{{dau_dg}}</span> Than Last Periods
                           {%endif%}
                         </p>
                       </div>
@@ -113,7 +113,7 @@ content %}
                           class="text-sm mb-1 text-uppercase font-weight-bold"
                           align="center"
                         >
-                          <b style="font-size: 11px;">Average Monthly Active Users (MAU)</b>
+                          <b style="font-size: 11px;" data-toggle="tooltip" data-placement="top" title="Rata - rata user (unique) yang membuka aplikasi / website dalam waktu 30 hari ke belakang">Average Monthly Active Users (MAU)</b>
                         </p>
                         <h5 class="font-weight-bolder" align="center">
                           <p>
@@ -122,9 +122,9 @@ content %}
                         </h5>
                         <p class="mb-1" style="font-size:11px;" align="center">
                           {% if '-' in mau_dg %}
-                          <span class="text-danger text-sm font-weight-bolder">{{mau_dg}}</span> than Yesterday
+                          <span class="text-danger text-sm font-weight-bolder">{{mau_dg}}</span> Than Last Periods
                           {%else%}
-                          <span class="text-success text-sm font-weight-bolder">+{{mau_dg}}</span> than Yesterday
+                          <span class="text-success text-sm font-weight-bolder">+{{mau_dg}}</span> Than Last Periods
                           {%endif%}
                         </p>
                       </div>
@@ -143,7 +143,7 @@ content %}
                           class="text-sm mb-1 text-uppercase font-weight-bold"
                           align="center"
                         >
-                          <b style="font-size: 11px;">Register</b>
+                          <b style="font-size: 11px;" data-toggle="tooltip" data-placement="top" title="Jumlah users yang registrasi pada periode yang dipilih (not unique users)">Register</b>
                         </p>
                         <h5 class="font-weight-bolder" align="center">
                           <p>
@@ -152,9 +152,9 @@ content %}
                         </h5>
                         <p class="mb-1" style="font-size:12px;" align="center">
                           {% if '-' in daily_growth_register %}
-                          <span class="text-danger text-sm font-weight-bolder">{{daily_growth_register}}</span> Than Last Week
+                          <span class="text-danger text-sm font-weight-bolder">{{daily_growth_register}}</span> Than Last Periods
                           {%else%}
-                          <span class="text-success text-sm font-weight-bolder">+{{daily_growth_register}}</span> Than Last Week
+                          <span class="text-success text-sm font-weight-bolder">+{{daily_growth_register}}</span> Than Last Periods
                           {%endif%}
                         </p>
                       </div>
@@ -213,7 +213,7 @@ content %}
                           class="text-sm mb-1 text-uppercase font-weight-bold"
                           align="center"
                         >
-                          <b style="font-size: 11px;">Total Readers</b>
+                          <b style="font-size: 11px;" data-toggle="tooltip" data-placement="top" title="Jumlah pembaca total (guest+registered) pada hari yang dipilih sesuai periode (not unqiue users)">Total Readers</b>
                         </p>
                         <h5 class="font-weight-bolder" align="center">
                           <p>
@@ -222,9 +222,9 @@ content %}
                         </h5>
                         <p class="mb-1" style="font-size:12px;" align="center">
                           {% if '-' in dg_total_pembaca %}
-                          <span class="text-danger text-sm font-weight-bolder">{{dg_total_pembaca}}</span> than Last Periods
+                          <span class="text-danger text-sm font-weight-bolder">{{dg_total_pembaca}}</span> Than Last Periods
                           {%else%}
-                          <span class="text-success text-sm font-weight-bolder">+{{dg_total_pembaca}}</span> than Last Periods
+                          <span class="text-success text-sm font-weight-bolder">+{{dg_total_pembaca}}</span> Than Last Periods
                           {%endif%}
                         </p>
                       </div>
@@ -243,7 +243,7 @@ content %}
                           class="text-sm mb-1 text-uppercase font-weight-bold"
                           align="center"
                         >
-                          <b style="font-size: 11px;">Guest Readers</b>
+                          <b style="font-size: 11px;" data-toggle="tooltip" data-placement="top" title="Jumlah pembaca chapter gooddreamer yang belum registrasi pada hari yang dipilih sesuai periode (not unique users)">Guest Readers</b>
                         </p>
                         <h5 class="font-weight-bolder" align="center">
                           <p>
@@ -252,9 +252,9 @@ content %}
                         </h5>
                         <p class="mb-1" style="font-size:12px;" align="center">
                           {% if '-' in dg_guest_reader %}
-                          <span class="text-danger text-sm font-weight-bolder">{{dg_guest_reader}}</span> than Last Periods
+                          <span class="text-danger text-sm font-weight-bolder">{{dg_guest_reader}}</span> Than Last Periods
                           {%else%}
-                          <span class="text-success text-sm font-weight-bolder">+{{dg_guest_reader}}</span> than Last Periods
+                          <span class="text-success text-sm font-weight-bolder">+{{dg_guest_reader}}</span> Than Last Periods
                           {%endif%}
                         </p>
                       </div>
@@ -273,7 +273,7 @@ content %}
                           class="text-sm mb-1 text-uppercase font-weight-bold"
                           align="center"
                         >
-                          <b style="font-size: 11px;">Register Readers</b>
+                          <b style="font-size: 11px;" data-toggle="tooltip" data-placement="top" title="Jumlah pembaca chapter gooddreamer pada hari yang dipilih sesuai periode (not unique users)">Register Readers</b>
                         </p>
                         <h5 class="font-weight-bolder" align="center">
                           <p>
@@ -282,9 +282,9 @@ content %}
                         </h5>
                         <p class="mb-1" style="font-size:12px;" align="center">
                           {% if '-' in dg_register_reader %}
-                          <span class="text-danger text-sm font-weight-bolder">{{dg_register_reader}}</span> than Last Periods
+                          <span class="text-danger text-sm font-weight-bolder">{{dg_register_reader}}</span> Than Last Periods
                           {%else%}
-                          <span class="text-success text-sm font-weight-bolder">+{{dg_register_reader}}</span> than Last Periods
+                          <span class="text-success text-sm font-weight-bolder">+{{dg_register_reader}}</span> Than Last Periods
                           {%endif%}
                         </p>
                       </div>
@@ -312,7 +312,7 @@ content %}
                           class="text-sm mb-1 text-uppercase font-weight-bold"
                           align="center"
                         >
-                          <b style="font-size: 11px;">Coin Purchase</b>
+                          <b style="font-size: 11px;" data-toggle="tooltip" data-placement="top" title="Jumlah pembelian koin dalam periode yang dipilih sesuai periode (not unique users)">Coin Purchase</b>
                         </p>
                         <h5 class="font-weight-bolder" align="center">
                           <p>
@@ -321,9 +321,9 @@ content %}
                         </h5>
                         <p class="mb-1" style="font-size:12px;" align="center">
                           {% if '-' in dg_coin_period %}
-                          <span class="text-danger text-sm font-weight-bolder">{{dg_coin_period}}</span> than Last Periods
+                          <span class="text-danger text-sm font-weight-bolder">{{dg_coin_period}}</span> Than Last Periods
                           {%else%}
-                          <span class="text-success text-sm font-weight-bolder">+{{dg_coin_period}}</span> than Last Periods
+                          <span class="text-success text-sm font-weight-bolder">+{{dg_coin_period}}</span> Than Last Periods
                           {%endif%}
                         </p>
                       </div>
@@ -342,7 +342,7 @@ content %}
                           class="text-sm mb-1 text-uppercase font-weight-bold"
                           align="center"
                         >
-                          <b style="font-size: 11px;">Unique Coin Purchase</b>
+                          <b style="font-size: 11px;" data-toggle="tooltip" data-placement="top" title="User yang melakukan pembelian koin dalam periode yang dipilih sesuai periode ">Unique Coin Purchase</b>
                         </p>
                         <h5 class="font-weight-bolder" align="center">
                           <p>
@@ -351,9 +351,9 @@ content %}
                         </h5>
                         <p class="mb-1" style="font-size:12px;" align="center">
                           {% if '-' in dg_coin_unique_period %}
-                          <span class="text-danger text-sm font-weight-bolder">{{dg_coin_unique_period}}</span> than Last Periods
+                          <span class="text-danger text-sm font-weight-bolder">{{dg_coin_unique_period}}</span> Than Last Periods
                           {%else%}
-                          <span class="text-success text-sm font-weight-bolder">+{{dg_coin_unique_period}}</span> than Last Periods
+                          <span class="text-success text-sm font-weight-bolder">+{{dg_coin_unique_period}}</span> Than Last Periods
                           {%endif%}
                         </p>
                       </div>
@@ -372,7 +372,7 @@ content %}
                           class="text-sm mb-1 text-uppercase font-weight-bold"
                           align="center"
                         >
-                          <b style="font-size: 11px;">Novel Purchase</b>
+                          <b style="font-size: 11px;" data-toggle="tooltip" data-placement="top" title="Jumlah pembelian Novel dalam periode yang dipilih sesuai periode (not unique users)">Novel Purchase</b>
                         </p>
                         <h5 class="font-weight-bolder" align="center">
                           <p>
@@ -381,9 +381,9 @@ content %}
                         </h5>
                         <p class="mb-1" style="font-size:12px;" align="center">
                           {% if '-' in dg_novel_period %}
-                          <span class="text-danger text-sm font-weight-bolder">{{dg_novel_period}}</span> than Last Periods
+                          <span class="text-danger text-sm font-weight-bolder">{{dg_novel_period}}</span> Than Last Periods
                           {%else%}
-                          <span class="text-success text-sm font-weight-bolder">+{{dg_novel_period}}</span> than Last Periods
+                          <span class="text-success text-sm font-weight-bolder">+{{dg_novel_period}}</span> Than Last Periods
                           {%endif%}
                         </p>
                       </div>
@@ -402,7 +402,7 @@ content %}
                           class="text-sm mb-1 text-uppercase font-weight-bold"
                           align="center"
                         >
-                          <b style="font-size: 11px;">Unique Novel Purchase</b>
+                          <b style="font-size: 11px;" data-toggle="tooltip" data-placement="top" title="User melakukan yang pembelian Novel dalam periode yang dipilih sesuai periode">Unique Novel Purchase</b>
                         </p>
                         <h5 class="font-weight-bolder" align="center">
                           <p>
@@ -411,9 +411,9 @@ content %}
                         </h5>
                         <p class="mb-1" style="font-size:12px;" align="center">
                           {% if '-' in dg_novel_unique_period %}
-                          <span class="text-danger text-sm font-weight-bolder">{{dg_novel_unique_period}}</span> than Last Periods
+                          <span class="text-danger text-sm font-weight-bolder">{{dg_novel_unique_period}}</span> Than Last Periods
                           {%else%}
-                          <span class="text-success text-sm font-weight-bolder">+{{dg_novel_unique_period}}</span> than Last Periods
+                          <span class="text-success text-sm font-weight-bolder">+{{dg_novel_unique_period}}</span> Than Last Periods
                           {%endif%}
                         </p>
                       </div>
@@ -460,18 +460,18 @@ content %}
                           class="text-sm mb-1 text-uppercase font-weight-bold"
                           align="center"
                         >
-                          <b style="font-size: 11px;">Overall Cost</b>
+                          <b style="font-size: 11px;" data-toggle="tooltip" data-placement="top" title="Total cost yang dikeluarkan dalam periode tertentu">Overall Cost</b>
                         </p>
                         <h5 class="font-weight-bolder" align="center">
                           <p>
-                            {{installs_text}}
+                            {{cost_txt}}
                           </p>
                         </h5>
                         <p class="mb-1" style="font-size:12px;" align="center">
                           {% if '-' in dg_installs %}
-                          <span class="text-danger text-sm font-weight-bolder">{{dg_installs}}</span> than Last Periods
+                          <span class="text-danger text-sm font-weight-bolder">{{dg_installs}}</span> Than Last Periods
                           {%else%}
-                          <span class="text-success text-sm font-weight-bolder">+{{dg_installs}}</span> than Last Periods
+                          <span class="text-success text-sm font-weight-bolder">+{{dg_installs}}</span> Than Last Periods
                           {%endif%}
                         </p>
                       </div>
@@ -490,18 +490,18 @@ content %}
                           class="text-sm mb-1 text-uppercase font-weight-bold"
                           align="center"
                         >
-                          <b style="font-size: 11px;">Coin Purchase</b>
+                          <b style="font-size: 11px;" data-toggle="tooltip" data-placement="top" title="Jumlah pembelian koin dalam periode yang dipilih sesuai periode (not unique users)">Coin Purchase</b>
                         </p>
                         <h5 class="font-weight-bolder" align="center">
                           <p>
-                            {{dau_avg_periods}}
+                            {{beli_coin_week}}
                           </p>
                         </h5>
                         <p class="mb-1" style="font-size:12px;" align="center">
-                          {% if '-' in dau_dg %}
-                          <span class="text-danger text-sm font-weight-bolder">{{dau_dg}}</span> than Yesterday
+                          {% if '-' in dg_coin_period %}
+                          <span class="text-danger text-sm font-weight-bolder">{{dg_coin_period}}</span> Than Last Periods
                           {%else%}
-                          <span class="text-success text-sm font-weight-bolder">+{{dau_dg}}</span> than Yesterday
+                          <span class="text-success text-sm font-weight-bolder">+{{dg_coin_period}}</span> Than Last Periods
                           {%endif%}
                         </p>
                       </div>
@@ -520,18 +520,18 @@ content %}
                           class="text-sm mb-1 text-uppercase font-weight-bold"
                           align="center"
                         >
-                          <b style="font-size: 11px;">Revenue</b>
+                          <b style="font-size: 11px;" data-toggle="tooltip" data-placement="top" title="Jumlah pendapatan dari penjualan koin">Revenue</b>
                         </p>
                         <h5 class="font-weight-bolder" align="center">
                           <p>
-                            {{mau_avg_periods}}
+                            {{revenue.values[0]}}
                           </p>
                         </h5>
                         <p class="mb-1" style="font-size:11px;" align="center">
-                          {% if '-' in mau_dg %}
-                          <span class="text-danger text-sm font-weight-bolder">{{mau_dg}}</span> than Yesterday
+                          {% if '-' in dg_revenues%}
+                          <span class="text-danger text-sm font-weight-bolder">{{dg_revenues}}</span> Than Last Periods
                           {%else%}
-                          <span class="text-success text-sm font-weight-bolder">+{{mau_dg}}</span> than Yesterday
+                          <span class="text-success text-sm font-weight-bolder">+{{dg_revenues}}</span> Than Last Periods
                           {%endif%}
                         </p>
                       </div>
@@ -550,18 +550,18 @@ content %}
                           class="text-sm mb-1 text-uppercase font-weight-bold"
                           align="center"
                         >
-                          <b style="font-size: 11px;">Average Revenue Per Transaction (ARPU)</b>
+                          <b style="font-size: 10px;" data-toggle="tooltip" data-placement="top" title="Rata - rata pendapatan per 1 transaksi yang membeli koin">Average Revenue Per Transaction (ARPU)</b>
                         </p>
                         <h5 class="font-weight-bolder" align="center">
                           <p>
-                            {{register_week.scalar()}}
+                            {{arpu_text}}
                           </p>
                         </h5>
                         <p class="mb-1" style="font-size:12px;" align="center">
-                          {% if '-' in daily_growth_register %}
-                          <span class="text-danger text-sm font-weight-bolder">{{daily_growth_register}}</span> Than Last Week
+                          {% if '-' in dg_arpu_text %}
+                          <span class="text-danger text-sm font-weight-bolder">{{dg_arpu_text}}</span> Than Last Periods
                           {%else%}
-                          <span class="text-success text-sm font-weight-bolder">+{{daily_growth_register}}</span> Than Last Week
+                          <span class="text-success text-sm font-weight-bolder">+{{dg_arpu_text}}</span> Than Last Periods
                           {%endif%}
                         </p>
                       </div>
@@ -573,6 +573,18 @@ content %}
           </div>
         </div>
         <span style="font-size: 12px;">*Data delayed 1 Day and DAU & MAU updated every start of the week</span>
+      </div>
+    </div>
+    <div class="row mt-4">
+      <div class="col-lg-12 mb-lg-0 mb-4">
+        <div class="card z-index-2 h-100">
+          <div class="card-body p-3">
+            <div class="cost-revenue">
+              <div id="chart_cost" class="cost-revenue-chart"></div>
+              <span style="font-size: 12px;">*Data delayed 1 day</span>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
     <footer class="footer pt-3">
@@ -647,6 +659,7 @@ content %}
   <link rel="stylesheet" href="/resources/demos/style.css" />
   <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
   <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.min.js"></script>
   <script>
     $(function () {
       var dateFormat = "mm/dd/yy",
@@ -696,6 +709,14 @@ content %}
 
     var graphs_12 = {{user_journey_chart | safe}};
     Plotly.plot('chart_12',graphs_12,{});
+
+    var graphs_chart = {{revenue_cost_charts | safe}};
+    Plotly.plot('chart_cost',graphs_chart,{});
+  </script>
+  <script>
+    $(function () {
+      $('[data-toggle="tooltip"]').tooltip()
+    })
   </script>
 </main>
 {% endblock %}

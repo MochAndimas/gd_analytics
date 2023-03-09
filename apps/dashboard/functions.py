@@ -249,12 +249,12 @@ def genre_pembaca(from_date='2023-01-01', to_date='2023-02-06'):
     return chart
 
 
-def total_gross_revenue():
+def total_gross_revenue(from_date=None, to_date=None):
     """revenue convert lambda"""
 
     rv = db.session.query(
         db.func.sum(gtd.package_price+gtd.package_fee).label('revenue')
-    ).join(gt, gt.id == gtd.transaction_id).filter(db.func.date(gt.created_at) >= '2023-01-01', gt.transaction_status == 1)
+    ).join(gt, gt.id == gtd.transaction_id).filter(db.func.date(gt.created_at).between(from_date, to_date), gt.transaction_status == 1)
     df = pd.DataFrame(rv)
     convert_rp = df['revenue'].apply(lambda x: "Rp. {:,f}".format((x)))
 
@@ -520,18 +520,19 @@ def daily_growth_total_coin():
     return txt
 
 
-def dg_revenue_gross():
+def dg_revenue_gross(from_date=None, to_date=None, timedelta=1):
     """daily growth gross revenue"""
 
     today = db.session.query(
         db.func.sum(gtd.package_price+gtd.package_fee).label('revenue')
-    ).join(gt, gt.id == gtd.transaction_id).filter(db.func.date(gt.created_at) == date.today(), gt.transaction_status == 1).scalar()
-    last_1_days = datetime.datetime.today() - datetime.timedelta(1)
-    yesterday_date = last_1_days.date()
+    ).join(gt, gt.id == gtd.transaction_id).filter(db.func.date(gt.created_at).between(from_date, to_date), gt.transaction_status == 1).scalar()
+    delta = (to_date - from_date)+datetime.timedelta(1)
+    fromdate_lastweek = from_date - delta
+    todate_lastweek = to_date - delta
     yesterday = db.session.query(
         db.func.sum(gtd.package_price+gtd.package_fee).label('revenue')
-    ).join(gt, gt.id == gtd.transaction_id).filter(db.func.date(gt.created_at) == yesterday_date, gt.transaction_status == 1).scalar()
-
+    ).join(gt, gt.id == gtd.transaction_id).filter(db.func.date(gt.created_at).between(fromdate_lastweek, todate_lastweek), gt.transaction_status == 1).scalar()
+    
     if today == None or yesterday == None:
         growth = 0
     else:
@@ -595,8 +596,9 @@ def coin_days(from_date='2023-01-01', to_date='2023-02-06'):
 
 def dg_register(from_date=None, to_date=None):
     """daily growth register"""
-    fromdate_lastweek = from_date - datetime.timedelta(7)
-    todate_lastweek = to_date - datetime.timedelta(7)
+    delta = (to_date - from_date)+datetime.timedelta(1)
+    fromdate_lastweek = from_date - delta
+    todate_lastweek = to_date - delta
 
     week1 = db.session.query(
         db.func.count(ac.id)
@@ -650,8 +652,9 @@ def beli_coin_unique(from_date=None, to_date=None):
 def dg_coin_periods(from_date=None, to_date=None):
     """daily growth pembelian coin"""
 
-    fromdate_lastweek = from_date - datetime.timedelta(7)
-    todate_lastweek = to_date - datetime.timedelta(7) 
+    delta = (to_date - from_date)+datetime.timedelta(1)
+    fromdate_lastweek = from_date - delta
+    todate_lastweek = to_date - delta
 
     w1 = beli_coin(from_date=from_date, to_date=to_date).scalar()
     w2 = beli_coin(from_date=fromdate_lastweek, to_date=todate_lastweek).scalar()
@@ -683,6 +686,7 @@ def dg_coin_unique_periods(from_date=None, to_date=None):
 
     return txt
 
+
 def beli_novel(from_date=None, to_date=None):
     """beli_novel last week"""
     beli_novel_w1 = db.session.query(
@@ -706,8 +710,9 @@ def beli_novel_unique(from_date=None, to_date=None):
 
 def dg_novel_periods(from_date=None, to_date=None):
     """daily growth pembelian novel periods"""
-    fromdate_lastweek = from_date - datetime.timedelta(7)
-    todate_lastweek = to_date - datetime.timedelta(7)
+    delta = (to_date - from_date)+datetime.timedelta(1)
+    fromdate_lastweek = from_date - delta
+    todate_lastweek = to_date - delta
 
     w1 = beli_novel(from_date=from_date, to_date=to_date).scalar()
     w2 = beli_novel(from_date=fromdate_lastweek, to_date=todate_lastweek).scalar()
@@ -724,8 +729,9 @@ def dg_novel_periods(from_date=None, to_date=None):
 
 def dg_novel_unique_periods(from_date=None, to_date=None):
     """daily growth pembelian novel periods"""
-    fromdate_lastweek = from_date - datetime.timedelta(7)
-    todate_lastweek = to_date - datetime.timedelta(7)
+    delta = (to_date - from_date)+datetime.timedelta(1)
+    fromdate_lastweek = from_date - delta
+    todate_lastweek = to_date - delta
 
     w1 = beli_novel_unique(from_date=from_date, to_date=to_date)
     w2 = beli_novel_unique(from_date=fromdate_lastweek, to_date=todate_lastweek)
@@ -951,8 +957,9 @@ def af_installs(from_date=None, to_date=None):
 
 def dg_af_installs(from_date=None, to_date=None):
     """daily growth installs"""
-    fromdate_lastweek = from_date - datetime.timedelta(7)
-    todate_lastweek = to_date - datetime.timedelta(7)
+    delta = (to_date - from_date)+datetime.timedelta(1)
+    fromdate_lastweek = from_date - delta
+    todate_lastweek = to_date - delta
 
     non_organic_csv = pd.read_csv('./installs_report.csv', index_col=False, low_memory=False)
     non_organic_df = pd.DataFrame(non_organic_csv)
@@ -1010,8 +1017,9 @@ def guest_register_reader_periods(from_date=None, to_date=None, is_guest=None):
 def dg_pembaca_periods(from_date=None, to_date=None):
     """daily growth tota; pembaca per periods"""
 
-    fromdate_lastweek = from_date - datetime.timedelta(7)
-    todate_lastweek = to_date - datetime.timedelta(7)  
+    delta = (to_date - from_date)+datetime.timedelta(1)
+    fromdate_lastweek = from_date - delta
+    todate_lastweek = to_date - delta  
 
     w1 = pembaca_periods(from_date=from_date, to_date=to_date)
     w2 = pembaca_periods(from_date=fromdate_lastweek, to_date=todate_lastweek)
@@ -1026,8 +1034,9 @@ def dg_pembaca_periods(from_date=None, to_date=None):
 def dg_guest_register_reader(from_date=None, to_date=None, is_guest=None):
     """daily growth guest reader"""
 
-    fromdate_lastweek = from_date - datetime.timedelta(7)
-    todate_lastweek = to_date - datetime.timedelta(7) 
+    delta = (to_date - from_date)+datetime.timedelta(1)
+    fromdate_lastweek = from_date - delta
+    todate_lastweek = to_date - delta 
 
     w1 = guest_register_reader_periods(from_date=from_date, to_date=to_date, is_guest=is_guest)
     w2 = guest_register_reader_periods(from_date=fromdate_lastweek, to_date=todate_lastweek, is_guest=is_guest)
@@ -1073,6 +1082,117 @@ def user_activity(from_date=None, to_date=None):
     fig.update_layout(title='User Journey')
     fig.update_xaxes(title='Date', dtick='D1')
     fig.update_yaxes(title='Total Pembelian')
+
+    chart = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
+
+    return chart
+
+
+def arpu(from_date=None, to_date=None):
+    """average revenue per user"""
+
+    query = db.session.query(
+        db.func.avg(gtd.package_price + gtd.package_fee).label('average')
+    ).join(gt, gtd.transaction_id == gt.id).filter(db.func.date(gt.created_at).between(from_date, to_date), gt.transaction_status == 1)
+
+    df = pd.DataFrame(query)
+    convert_rp = df['average'].apply(lambda x: "Rp. {:,.0f}".format((x)))
+
+    return convert_rp.values[0]
+
+
+def dg_arpu(from_date=None, to_date=None):
+    """daily growth arpu"""
+    
+    delta = (to_date - from_date)+datetime.timedelta(1)
+    fromdate_lastweek = from_date - delta
+    todate_lastweek = to_date - delta
+
+    w1 = db.session.query(
+        db.func.avg(gtd.package_price + gtd.package_fee).label('average')
+    ).join(gt, gtd.transaction_id == gt.id).filter(db.func.date(gt.created_at).between(from_date, to_date), gt.transaction_status == 1).scalar()
+
+    w2 = db.session.query(
+        db.func.avg(gtd.package_price + gtd.package_fee).label('average')
+    ).join(gt, gtd.transaction_id == gt.id).filter(db.func.date(gt.created_at).between(fromdate_lastweek, todate_lastweek), gt.transaction_status == 1).scalar()
+
+    if w1 == 0:
+        dg = 0
+    else:
+        dg = (w1-w2)/w1
+
+    txt = "{:.0%}".format(dg)
+
+    return txt
+
+
+def cost():
+    """overal cost"""
+
+    read_csv = pd.read_csv('cost_revenue.csv', delimiter=',')
+    df = pd.DataFrame(read_csv)
+    print(df)
+    cost_sum = df.cost.sum()
+    
+    txt = "Rp. {:,.0f}".format(cost_sum)
+
+    return txt
+
+
+def revenue_cost_chart():
+    """revenue to cost chart"""
+
+    read_csv = pd.read_csv('cost_revenue.csv', delimiter=',')
+    df = pd.DataFrame(read_csv)
+    df['revenue_to_cost'] = pd.to_numeric(df['revenue_to_cost'])
+
+    trace1 = go.Bar(
+        x=df['date'],
+        y=df['cost'],
+        name='Cost',
+        yaxis='y'
+    )
+
+    trace2 = go.Scatter(
+        x=df['date'],
+        y=df['revenue_to_cost'],
+        name='Cost To Revenue',
+        yaxis='y2',
+        # Set the y-axis format to be a percentage with 2 decimal places
+        hovertemplate='%{y:.2%}'
+    )
+
+    trace3 = go.Bar(
+        x=df['date'],
+        y=df['revenue'],
+        name='Revenue',
+        yaxis='y'
+    )
+
+    # Define the layout with a secondary y-axis
+    layout = go.Layout(
+        title='Cost To Revenue',
+        yaxis=dict(
+            title='Cost'
+        ),
+        yaxis2=dict(
+            title='Cost To Revenue',
+            overlaying='y',
+            side='right',
+            # Set the y-axis format to be a percentage with 2 decimal places
+            tickformat='.0%'
+        )
+    )
+
+    # Combine the traces and layout into a Figure object
+    fig = go.Figure(data=[trace1, trace2, trace3], layout=layout)
+
+    fig.update_layout(legend=dict(
+    yanchor="top",
+    y=0.99,
+    xanchor="left",
+    x=0.01
+    ))
 
     chart = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
 

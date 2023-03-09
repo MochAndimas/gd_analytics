@@ -22,7 +22,7 @@ from apps.dashboard.functions import register, beli_novel, guest_register_reader
 from apps.dashboard.functions import dg_af_installs, install_chart, pembaca_periods
 from apps.dashboard.functions import dg_pembaca_periods, dg_guest_register_reader, beli_coin_unique, beli_novel_unique
 from apps.dashboard.functions import dg_coin_periods, dg_coin_unique_periods, dg_novel_periods, dg_novel_unique_periods
-from apps.dashboard.functions import user_activity
+from apps.dashboard.functions import user_activity, arpu, dg_arpu, cost, revenue_cost_chart
 from decouple import config
 
 
@@ -109,7 +109,7 @@ def coin_page():
     dg_coin_expired = daily_growth_coin(transaction_status=2,from_date=yesterday_date, to_date=date.today())
     dg_coin_success = daily_growth_coin(transaction_status=1, from_date=yesterday_date, to_date=date.today())
     dg_total_coin = daily_growth_total_coin()
-    dg_revenue_gross_txt = dg_revenue_gross()
+    dg_revenue_gross_txt = dg_revenue_gross(from_date=to_date, to_date=to_date)
     dg_revenue_txt = dg_revenue()
 
     # coin purchase /Month
@@ -119,7 +119,7 @@ def coin_page():
     rev_month = revenue_month()
 
     # total gross revenue chart
-    total_gross_rv = total_gross_revenue()
+    total_gross_rv = total_gross_revenue(from_date='2023-01-01', to_date=to_date)
 
     # total revenue
     total_rv = total_revenue()
@@ -166,8 +166,9 @@ def in_app_page():
     last8days_date = las8days.date()
     from_date = last8days_date
     to_date = last2day_date
-    fromdate_lastweek = from_date - datetime.timedelta(7)
-    todate_lastweek = to_date -datetime.timedelta(7)
+    delta = (to_date - from_date)+datetime.timedelta(1)
+    fromdate_lastweek = from_date - delta
+    todate_lastweek = to_date - delta
 
     if request.method == 'POST':
         from_date = datetime.datetime.strptime(request.form['from'], '%Y-%m-%d').date()
@@ -207,13 +208,25 @@ def in_app_page():
     dg_total_pembaca = dg_pembaca_periods(from_date=from_date, to_date=to_date)
     dg_guest_reader = dg_guest_register_reader(from_date=from_date, to_date=to_date, is_guest=1)
     dg_register_reader = dg_guest_register_reader(from_date=from_date, to_date=to_date, is_guest=0)
-    dg_coin_period = dg_coin_periods(from_date=from_date, to_date=to_date)
+    dg_coin_period = dg_coin_periods(from_date=from_date, to_date=to_date) # used in cost & revenue too
     dg_coin_unique_period = dg_coin_unique_periods(from_date=from_date, to_date=to_date) 
     dg_novel_period = dg_novel_periods(from_date=from_date, to_date=to_date)
     dg_novel_unique_period = dg_novel_unique_periods(from_date=from_date, to_date=to_date)
 
     # user activity daily growth
     user_journey_chart = user_activity(from_date=from_date, to_date=to_date)
+
+    # Cost & revenue
+    cost_txt = cost()
+    revenue = total_gross_revenue(from_date=from_date, to_date=to_date)
+    arpu_text = arpu(from_date=from_date, to_date=to_date)
+
+    # daily growth cost &revenue
+    dg_revenues = dg_revenue_gross(from_date=from_date, to_date=to_date, timedelta=7)
+    dg_arpu_text = dg_arpu(from_date=from_date, to_date=to_date)
+
+    # cost & revenue chart
+    revenue_cost_charts = revenue_cost_chart()
     
     return render_template(
         'in_app.html',
@@ -244,4 +257,10 @@ def in_app_page():
         dg_coin_unique_period=dg_coin_unique_period,
         dg_novel_period=dg_novel_period,
         dg_novel_unique_period=dg_novel_unique_period,
-        user_journey_chart=user_journey_chart)
+        user_journey_chart=user_journey_chart,
+        revenue=revenue,
+        dg_revenues=dg_revenues, 
+        arpu_text=arpu_text,
+        dg_arpu_text=dg_arpu_text,
+        cost_txt=cost_txt,
+        revenue_cost_charts=revenue_cost_charts)
